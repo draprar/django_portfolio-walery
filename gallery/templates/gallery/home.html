@@ -1,0 +1,63 @@
+{% extends 'gallery/core.html' %}
+{% load static %}
+
+{% block title %}walerydocholery{% endblock %}
+
+{% block content %}
+
+<!-- About Me Section -->
+<section class="about-me fade-in">
+    <div class="about-content">
+        <h1>Welcome to walerydocholery gallery</h1>
+        <p>Have fun exploring.</p>
+    </div>
+</section>
+
+<!-- Instagram Section (Show Only If "All" or "Instagram" is Selected) -->
+{% if not selected_category or selected_category == 'All' or selected_category == 'Instagram' %}
+    {% if instagram_posts %}
+        <section class="instagram-section fade-in">
+            <h2 class="section-title">Instagram</h2>
+            <div class="instagram-grid">
+                {% for post in instagram_posts %}
+                    <div class="instagram-item">
+                        <blockquote class="instagram-media" data-instgrm-permalink="{{ post.image_url }}" data-instgrm-version="13">
+                            <a href="{{ post.image_url }}" target="_blank">View on Instagram</a>
+                        </blockquote>
+                    </div>
+                {% endfor %}
+            </div>
+            <script async src="https://www.instagram.com/embed.js"></script>
+        </section>
+    {% endif %}
+{% endif %}
+
+<!-- Gallery Section (Show Only If "All" or a Gallery Category is Selected) -->
+{% if not selected_category or selected_category == 'All' or selected_category != 'Instagram' %}
+    <section class="gallery-container fade-in">
+        <h2 class="section-title">
+            {% if selected_category and selected_category != 'All' %}
+                {{ selected_category }}
+            {% else %}
+                GenAI
+            {% endif %}
+        </h2>
+
+        <div class="gallery-grid">
+            {% for object in object_list %}
+                <div class="gallery-item">
+                    <a href="{{ object.image.url }}" data-fancybox="gallery" data-caption="{{ object.description|default:'Untitled' }}">
+                        <img src="{{ object.image.url }}" alt="{{ object.description|default:'Artwork' }}" loading="lazy">
+                        <div class="overlay">
+                            <p>{{ object.description|default:"Untitled" }}</p>
+                        </div>
+                    </a>
+                </div>
+            {% empty %}
+                <p class="no-images">No images found in this category.</p>
+            {% endfor %}
+        </div>
+    </section>
+{% endif %}
+
+{% endblock %}

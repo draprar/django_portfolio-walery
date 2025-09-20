@@ -1,0 +1,32 @@
+{% load static %}
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+<h1><strong>WŁAŚCIWIE ĆWICZ GŁOS</strong></h1>
+<p class="col-md-16 fs-4">Wypowiadaj każde słowo na głos 🔉 Nie spiesz się. Mów wyraźnie i staraj się nie podnosić swojego głosu. Zachowaj naturalny i lekki ton, pamiętaj, aby otwierać szeroko buzię 😉</p>
+<button id="mirror-btn-exercises" class="btn btn-dark text-uppercase fw-bold">💻 Otwórz lusterko</button><br><br>
+<img src="{% static 'tonguetwister/assets/arrows.svg' %}" alt="" width="24" height="24" class="d-inline-block align-text-top"><br>
+<div id="exercises-container">
+    {% for exercise in exercises %}
+        <div class="exercise col-md-16 fs-4 bg-light bg-gradient text-center shadow-sm p-3 my-3 rounded border" id="exercise-{{ exercise.id }}">{{ exercise.text }}</div>
+        {% if user.is_authenticated %}
+            {% if exercise.text in user_exercises_texts %}
+                <button class="btn btn-secondary toggle-exercise-btn" data-id="{{ exercise.id }}" data-user-exercise-id="{{ user_exercise.id }}" disabled>W powtórkach 😄</button>
+            {% else %}
+                <button class="btn btn-success toggle-exercise-btn" data-id="{{ exercise.id }}">Dodaj do powtórek</button>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+</div>
+<br>
+<button id="load-more-exercises-btn" class="btn btn-dark btn-lg text-uppercase fw-bold" data-offset="{{ exercises|length }}" data-url="{% url 'load_more_exercises' %}" data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}">Chcę jeszcze!</button>
+<br><br>
+<div id="card-exercises" class="card text-white bg-secondary mt-3 mb-3 w-100 shadow" style="display: none;">
+    <audio id="success-sound-exercises" src="{% static 'tonguetwister/sounds/fanfare.mp3' %}" preload="auto"></audio>
+    <div class="card-body">
+        <p class="card-text text-center mb-0">Winszujemy! 🎉 Prawdziwe igraszki zaczynają się właśnie teraz 🥳 Czy poradzisz sobie z zemstą logopedy? 👀</p>
+    </div>
+</div>
+<div id="video-container-exercises" style="display:none;">
+    <video id="video-preview-exercises" autoplay muted playsinline></video>
+</div>
+<script src="{% static 'tonguetwister/js/loadAddDeleteExercises.js' %}"></script>
+<script src="{% static 'tonguetwister/js/videoStreamExercises.js' %}"></script>

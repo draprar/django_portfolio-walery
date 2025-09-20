@@ -1,0 +1,53 @@
+{% load static %}
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LingwoŁamki - przedłuż swój język - Profil</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'tonguetwister/css/style.css' %}" rel="stylesheet"/>
+    <link rel="icon" href="{% static 'tonguetwister/assets/favicon.ico' %}" type="image/x-icon"/>
+</head>
+<body>
+<div class="d-flex align-items-center">
+<h1><img src="{% static 'tonguetwister/assets/ttlogo.png' %}" alt="" width="28" height="28" class="d-inline-block align-text-top"> Twoje LingwoŁamkowe ćwiczenia</h1>
+</div>
+<div class="d-flex align-items-center">
+<h3><a href="https://www.lingwolamki.online/"><em>www.lingwolamki.online</em></a></h3>
+</div>
+<br>
+<h2>Rozgrzewanie artykulatorów</h2>
+<div id="user-articulators-container">
+    {% for user_articulator in user_articulators %}
+        <div class="user-articulator col-md-16 fs-4" id="articulator-{{ user_articulator.id }}">
+            {{ user_articulator.articulator.text }}
+        </div>
+    {% empty %}
+        <p class="col-md-16 fs-4">Nie masz zapisanych ćwiczeń artykulacyjnych.</p>
+    {% endfor %}
+</div>
+<br>
+<h2>Ćwiczenia właściwe</h2>
+<div id="user-exercises-container">
+    {% for user_exercise in user_exercises %}
+        <div class="user-exercise col-md-16 fs-4" id="exercise-{{ user_exercise.id }}">
+            {{ user_exercise.exercise.text }}
+        </div>
+    {% empty %}
+        <p class="col-md-16 fs-4">Nie masz zapisanych ćwiczeń artykulacyjnych.</p>
+    {% endfor %}
+</div>
+<br>
+<h2>Łamańce językowe</h2>
+<div id="user-twisters-container">
+    {% for user_twister in user_twisters %}
+        <div class="user-twister col-md-16 fs-4" id="twister-{{ user_twister.id }}">
+            {{ user_twister.twister.text }}
+        </div>
+    {% empty %}
+        <p class="col-md-16 fs-4">Nie masz zapisanych łamańców językowych.</p>
+    {% endfor %}
+</div>
+<br>
+</body>
+</html>

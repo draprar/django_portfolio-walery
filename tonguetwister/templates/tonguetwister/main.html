@@ -1,0 +1,10 @@
+{% extends "tonguetwister/base.html" %}
+{% load static %}
+
+{% block content %}
+<h1><strong>ZEMSTA LOGOPEDY</strong></h1>
+<p class="col-md-16 fs-4">Przygotowaliśmy dla Ciebie najlepsze łamańce językowe do samodzielnego wymówienia na głos. Połamania języka! 🤺</p>
+<button id="mirror-btn-twisters" class="btn btn-dark text-uppercase fw-bold">💻 Otwórz lusterko</button><br><br>
+<img src="{% static 'tonguetwister/assets/arrows.svg' %}" alt="" width="24" height="24" class="d-inline-block align-text-top"><br>
+{% include 'tonguetwister/partials/gen/fifth-section.html' %}
+{% endblock %}

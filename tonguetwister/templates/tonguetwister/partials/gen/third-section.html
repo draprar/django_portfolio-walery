@@ -1,0 +1,34 @@
+{% load static %}
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+<h1><strong>ROZGRZEJ ARTYKULATORY</strong></h1>
+<p class="col-md-16 fs-4">Język, wargi, usta są jak akumulator w aucie 👨‍🔧<br>Bez odpowiedniego rozgrzania 🔥 nie odpalisz prawidłowo swojej wymowy.  Otwórz szeroko buzię i zacznij ćwiczyć.</p>
+<button id="mirror-btn-articulators" class="btn btn-dark text-uppercase fw-bold">💻 Otwórz lusterko</button>
+<br><br>
+<img src="{% static 'tonguetwister/assets/arrows.svg' %}" alt="" width="24" height="24" class="d-inline-block align-text-top"><br>
+<div id="articulators-container">
+    {% for articulator in articulators %}
+    <div class="articulator col-md-16 fs-4 bg-light bg-gradient text-center shadow-sm p-3 my-3 rounded border" id="articulator-{{ articulator.id }}">{{ articulator.text }}</div>
+        {% if user.is_authenticated %}
+            {% if articulator.text in user_articulators_texts %}
+                <button class="btn btn-secondary toggle-articulator-btn" data-id="{{ articulator.id }}" data-user-articulator-id="{{ user_articulator.id }}" disabled>W powtórkach 😄</button>
+            {% else %}
+                <button class="btn btn-success toggle-articulator-btn" data-id="{{ articulator.id }}">Dodaj do powtórek</button>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+</div>
+<br>
+<button id="load-more-btn" class="btn btn-dark btn-lg text-uppercase fw-bold" data-offset="{{ articulators|length }}" data-url="{% url 'load_more_articulators' %}" data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}">Chcę jeszcze!</button>
+<br><br>
+
+<div id="card-articulator" class="card text-white bg-secondary mt-3 mb-3 w-100 shadow" style="display: none;">
+    <audio id="success-sound-articulators" src="{% static 'tonguetwister/sounds/fanfare.mp3' %}" preload="auto"></audio>
+    <div class="card-body">
+        <p class="card-text text-center mb-0">WoW! 😎 Dobra robota! 👍 Czujesz ogień w gębie i rozpalenie na kolejne ćwiczenia? 🤩<br>Zapraszamy Cię na kolejne słówko 👉</p>
+    </div>
+</div>
+<div id="video-container-articulators" style="display:none;">
+    <video id="video-preview-articulators" autoplay muted playsinline></video>
+</div>
+<script src="{% static 'tonguetwister/js/loadAddDeleteArticulators.js' %}"></script>
+<script src="{% static 'tonguetwister/js/videoStreamArticulators.js' %}"></script>

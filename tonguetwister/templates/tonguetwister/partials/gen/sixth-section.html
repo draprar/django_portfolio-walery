@@ -1,0 +1,25 @@
+{% load static %}
+
+<h1><strong>PREZENT</strong></h1>
+<p class="col-md-16 fs-4">Kliknij w przycisk, aby otworzyć podarek.</p>
+<img src="{% static 'tonguetwister/assets/arrows.svg' %}" alt="" width="24" height="24" class="d-inline-block align-text-top">
+<div id="facts-container">
+    {% for funfact in funfacts %}
+    <div class="fact col-md-16 fs-4 bg-light bg-gradient text-center shadow-sm p-3 my-3 rounded border">{{ funfact.text }}</div>
+    {% endfor %}
+</div>
+<br>
+<button id="load-more-facts-btn" class="btn btn-dark btn-lg text-uppercase fw-bold" data-offset="{{ funfacts|length }}" data-url="{% url 'load_more_funfacts' %}" onclick="changeFactsButtonText()">Ciekawostka</button>
+<br><br>
+<div id="congratulations-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <audio id="success-sound-end" src="{% static 'tonguetwister/sounds/end.mp3' %}" preload="auto"></audio>
+        <p>Wiwat! 👏</p>
+        <p>Przyszło już do końca Twego mówienia. Ale jesteśmy zdania, że dalej chcesz biegle władać mową i ochoczo tu wrócisz.</p>
+        <button id="back-to-homepage-btn" class="btn btn-dark btn-lg btn-block" type="button">
+      <a class="navbar-brand" href="/">To co, żądasz satysfakcji? <img src="{% static 'tonguetwister/assets/ttlogo.png' %}" alt="" width="28" height="28" class="d-inline-block align-text-top"></a>
+    </button>
+    </div>
+</div>
+<script src="{% static 'tonguetwister/js/loadMoreBonuses.js' %}"></script>

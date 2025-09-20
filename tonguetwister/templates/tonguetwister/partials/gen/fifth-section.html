@@ -1,0 +1,29 @@
+{% load static %}
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+<div id="twisters-container">
+    {% for twister in twisters %}
+        <div class="twister col-md-16 fs-4 bg-light bg-gradient text-center shadow-sm p-3 my-3 rounded border" id="twister-{{ twister.id }}">{{ twister.text }}</div>
+        {% if user.is_authenticated %}
+            {% if twister.text in user_twisters_texts %}
+                <button class="btn btn-secondary toggle-twister-btn" data-id="{{ twister.id }}" data-user-articulator-id="{{ user_twister.id }}" disabled>W powtórkach 😄</button>
+            {% else %}
+                <button class="btn btn-success toggle-twister-btn" data-id="{{ twister.id }}">Dodaj do powtórek</button>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+</div>
+<br>
+<button id="load-more-twisters-btn" class="btn btn-dark btn-lg text-uppercase fw-bold" data-offset="{{ twisters|length }}" data-url="{% url 'load_more_twisters' %}" data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}">Chcę jeszcze!</button>
+<br><br>
+<div id="card-twister" class="card text-white bg-secondary mt-3 mb-3 w-100 shadow" style="display: none;">
+    <div class="card-body">
+        <audio id="success-sound-twisters" src="{% static 'tonguetwister/sounds/fanfare.mp3' %}" preload="auto"></audio>
+        <img src="{% static 'tonguetwister/assets/medal.svg' %}" alt="" width="96" height="96" class="d-inline-block align-text-top"><br><br>
+        <p class="card-text text-center mb-0">Wyrazy uznania 👏 od samego Króla Karola i Saszy z suchej Szosy! 👑 <br> My też jesteśmy z Ciebie dumni 🖖 <br> Mamy nadzieję, że spodobały Ci się językowe potyczki 👅 a w nagrodę sprawdź, jakie dary na Ciebie czekają.</p>
+    </div>
+</div>
+<div id="video-container-twisters" style="display:none;">
+    <video id="video-preview-twisters" autoplay muted playsinline></video>
+</div>
+<script src="{% static 'tonguetwister/js/loadAddDeleteTwisters.js' %}"></script>
+<script src="{% static 'tonguetwister/js/videoStreamTwisters.js' %}"></script>

@@ -1,0 +1,358 @@
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="author" content="Kmotr" />
+  <meta name="theme-color" content="#f8f9fa" />
+  <meta property="og:title" content="Walery | Portfolio" />
+  <meta property="og:description" content="Portfolio of Walery — Developer, Engineer, Analyst." />
+  <meta property="og:type" content="website" />
+  <title>Walery | Portfolio</title>
+  <meta name="description" content="Walery — engineer, programmer & creative mind. Web automation, analysis and custom tooling.">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <link rel="canonical" href="https://!!!!!" />
+  <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+</head>
+<body>
+<h1 class="visually-hidden">Walery – Portfolio</h1>
+<div id="loader">
+  <div class="spinner-border text-primary" role="status"></div>
+</div>
+
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container d-flex align-items-center justify-content-between">
+
+    <!-- LEWO: Walery -->
+    <a class="navbar-brand fw-bold mb-0" href="#">Walery</a>
+
+    <!-- ŚRODEK: EN/PL (MOBILE) -->
+    <div class="lang-switcher d-lg-none d-flex justify-content-center mx-auto my-0">
+      <button class="btn btn-sm btn-outline-secondary me-1 lang-btn" data-lang="en" onclick="switchLang('en')">EN</button>
+      <button class="btn btn-sm btn-outline-secondary lang-btn" data-lang="pl" onclick="switchLang('pl')">PL</button>
+    </div>
+
+    <!-- NAVIGATION -->
+    <div class="collapse navbar-collapse show" id="navbarNav"> <!-- show, żeby na desktopie burger nie działał -->
+      <ul class="navbar-nav me-auto w-100" id="navbarScrollSpy">
+        <li class="nav-item"><a class="nav-link" href="#about" data-en="About" data-pl="O mnie">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="#services" data-en="What I Offer" data-pl="Oferta">What I Offer</a></li>
+        <li class="nav-item"><a class="nav-link" href="#projects" data-en="Projects" data-pl="Projekty">Projects</a></li>
+        <li class="nav-item"><a class="nav-link" href="#contact" data-en="Contact" data-pl="Kontakt">Contact</a></li>
+
+        <!-- separator desktop -->
+        <li class="nav-item d-none d-lg-flex align-items-center px-2 text-muted">||</li>
+
+        <!-- separator mobile -->
+        <li class="nav-item d-lg-none">
+          <hr class="my-2" />
+        </li>
+
+        <!-- extra links smaller -->
+        <li class="nav-item"><a class="nav-link small" href="/gallery/" data-en="Gallery" data-pl="Galeria">Gallery</a></li>
+        <li class="nav-item"><a class="nav-link small" href="/tonguetwister/" data-en="Lingwołamki" data-pl="Lingwołamki">Lingwołamki</a></li>
+        <li class="nav-item"><a class="nav-link small" href="/rugby/" data-en="AFC Rugby" data-pl="AFC Rugby">AFC Rugby</a></li>
+      </ul>
+
+      <!-- DESKTOP: LANG -->
+      <div class="lang-switcher d-none d-lg-flex align-items-center ms-3 gap-2">
+        <button class="btn btn-sm btn-outline-secondary lang-btn" data-lang="en" onclick="switchLang('en')">EN</button>
+        <button class="btn btn-sm btn-outline-secondary lang-btn" data-lang="pl" onclick="switchLang('pl')">PL</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+
+<!-- Desktop Split Section -->
+<section class="split-section">
+  <div class="half left" aria-hidden="true" aria-label="Engineer side – code, automation, analysis">
+    <div class="text-box left-text">
+      <h2 class="text-uppercase" data-en="ENGINEERING" data-pl="INŻYNIERIA">ENGINEERING</h2>
+      <p data-en="I turn code into tools, and data into meaningful results."
+         data-pl="Z kodu tworzę narzędzia, a z danych — wartościowe rezultaty.">
+        I turn code into tools, and data into meaningful results.
+      </p>
+    </div>
+    <canvas id="matrixCanvas"></canvas>
+  </div>
+
+  <div class="half right" aria-hidden="true" aria-label="Creative side – ideas, flexibility, intuition">
+    <div class="text-box right-text">
+      <h2 class="text-uppercase" data-en="CREATIVITY" data-pl="KREATYWNOŚĆ">CREATIVITY</h2>
+      <p data-en="I transform ideas into art, and projects into stories."
+         data-pl="Pomysły przekuwam w sztukę, a projekty zamieniam w opowieści.">
+        I transform ideas into art, and projects into stories.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Mobile bubbles under split-section -->
+<div class="split-text-boxes-mobile d-flex flex-column flex-sm-row d-md-none px-3 gap-3">
+  <div class="text-box flex-fill text-center">
+    <h2 class="text-uppercase" data-en="ENGINEERING" data-pl="INŻYNIERIA">ENGINEERING</h2>
+    <p data-en="I turn code into tools, and data into meaningful results."
+       data-pl="Z kodu tworzę narzędzia, a z danych — wartościowe rezultaty.">
+      I turn code into tools, and data into meaningful results.
+    </p>
+  </div>
+  <div class="text-box flex-fill text-center">
+    <h2 class="text-uppercase" data-en="CREATIVITY" data-pl="KREATYWNOŚĆ">CREATIVITY</h2>
+    <p data-en="I transform ideas into art, and projects into stories."
+       data-pl="Pomysły przekuwam w sztukę, a projekty zamieniam w opowieści.">
+      I transform ideas into art, and projects into stories.
+    </p>
+  </div>
+</div>
+
+
+<!-- About Section -->
+<section id="about" class="container" data-aos="fade-up">
+  <h2 data-en="Who I am" data-pl="O mnie">Who I am</h2>
+
+  <p data-en="Hey there! I’m Walery — an engineer, programmer and analyst with over a decade of experience in production, electrical and telecom fields, plus a few years of practice in Python, data and automation. Day to day I handle technical stuff: from Python and ML, through data flows and automations, reports, audits and design, all the way to custom-built tools."
+     data-pl="Serwus! Jestem Walery — inżynier, programista i analityk z ponad dekadą doświadczenia w produkcji, elektryce i telekomunikacji oraz kilkuletnią praktyką w Pythonie, danych i automatyzacji. Na co dzień ogarniam techniczne tematy: od Pythona i ML, przez przepływy danych i automaty, raporty, audyty i projektowanie, aż po narzędzia szyte na miarę.">
+    Hey there! I’m Walery — an engineer, programmer and analyst with over a decade of experience in production, electrical and telecom fields, plus a few years of practice in Python, data and automation. Day to day I handle technical stuff: from Python and ML, through data flows and automations, reports, audits and design, all the way to custom-built tools.
+  </p>
+
+  <p data-en="I bring three perspectives to the table: analytical — turning numbers into value, engineering — with a structured approach to problems, and humanistic — keeping the message clear and simple."
+     data-pl="Łączę trzy spojrzenia: analityczne — gdzie liczby przekuwam w wartość, inżynierskie — z uporządkowanym podejściem do problemów, i humanistyczne — stawiając na jasny przekaz.">
+    I bring three perspectives to the table: analytical — turning numbers into value, engineering — with a structured approach to problems, and humanistic — keeping the message clear and simple.
+  </p>
+
+  <p data-en="After hours I draw, paint and build my own web projects — like an art gallery or a tongue-twister platform. This site is both my portfolio and part of a modular Django platform I’m developing. Below are the areas I move in — all tied together by one thing: I like building stuff that works."
+     data-pl="Po godzinach rysuję, maluję i rozwijam własne webowe projekty — jak galeria czy platforma z łamańcami językowymi. Ta strona to moje portfolio i część modularnej platformy Django, którą rozwijam. Poniżej znajdziesz obszary, w których się obracam — wszystkie łączy jedno: lubię budować rzeczy, które działają.">
+    After hours I draw, paint and build my own web projects — like an art gallery or a tongue-twister platform. This site is both my portfolio and part of a modular Django platform I’m developing. Below are the areas I move in — all tied together by one thing: I like building stuff that works.
+  </p>
+</section>
+<!-- Services Section -->
+<section id="services" class="container" data-aos="fade-up">
+  <h2 data-en="What I Can Help With" data-pl="W czym mogę pomóc">What I Can Help With</h2>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+
+    <div class="col">
+      <div class="card h-100 shadow-sm border-0 project-card text-center">
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <i class="fas fa-network-wired fa-2x mb-3 text-secondary"></i>
+            <h5 data-en="Telecom & Ops" data-pl="Telekom i operacje">Telecom & Ops</h5>
+            <p class="card-text small text-muted"
+               data-en="Years of field and office work in telecom, electrical and infra projects — from design and supervision to audits and reporting."
+               data-pl="Lata pracy terenowej i biurowej w telekomie, elektryce i infrastrukturze — od projektów i nadzorów po audyty i raporty.">
+              Years of field and office work in telecom, electrical and infra projects — from design and supervision to audits and reporting.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 shadow-sm border-0 project-card text-center">
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <i class="fas fa-database fa-2x mb-3 text-secondary"></i>
+            <h5 data-en="Data & Automation" data-pl="Dane i automatyzacja">Data & Automation</h5>
+            <p class="card-text small text-muted"
+               data-en="From cleaning and merging datasets to ML predictions, BI pipelines and custom Django apps — Python is my go-to."
+               data-pl="Od czyszczenia i łączenia danych, przez predykcje ML, pipeline’y BI i autorskie aplikacje Django — Python to moje narzędzie.">
+              From cleaning and merging datasets to ML predictions, BI pipelines and custom Django apps — Python is my go-to.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 shadow-sm border-0 project-card text-center">
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <i class="fas fa-file-alt fa-2x mb-3 text-secondary"></i>
+            <h5 data-en="Docs & Standards" data-pl="Dokumentacja i normy">Docs & Standards</h5>
+            <p class="card-text small text-muted"
+               data-en="Authoring instructions, guidelines, audits and technical docs — making complex stuff clear and usable."
+               data-pl="Piszę instrukcje, wytyczne, audyty i dokumentację techniczną — zamieniam złożone tematy w coś czytelnego i praktycznego.">
+              Authoring instructions, guidelines, audits and technical docs — making complex stuff clear and usable.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 shadow-sm border-0 project-card text-center">
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <i class="fas fa-tools fa-2x mb-3 text-secondary"></i>
+            <h5 data-en="Custom Tooling" data-pl="Narzędzia szyte na miarę">Custom Tooling</h5>
+            <p class="card-text small text-muted"
+               data-en="Deduplication, parsing, migrations, converters — real problems solved with tailor-made scripts."
+               data-pl="Deduplikacja, parsowanie, migracje, konwertery — realne problemy rozwiązuję dedykowanymi skryptami.">
+              Deduplication, parsing, migrations, converters — real problems solved with tailor-made scripts.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 shadow-sm border-0 project-card text-center">
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <i class="fas fa-users fa-2x mb-3 text-secondary"></i>
+            <h5 data-en="Training & Teamwork" data-pl="Szkolenia i zespoły">Training & Teamwork</h5>
+            <p class="card-text small text-muted"
+               data-en="From founding a rugby team to running technical trainings — I know how to move projects and people forward."
+               data-pl="Od założenia drużyny rugby po prowadzenie szkoleń technicznych — wiem, jak pchać projekty i ludzi do przodu.">
+              From founding a rugby team to running technical trainings — I know how to move projects and people forward.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card h-100 shadow-sm border-0 project-card text-center">
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <i class="fas fa-paint-brush fa-2x mb-3 text-secondary"></i>
+            <h5 data-en="Art & Projects" data-pl="Sztuka i projekty">Art & Projects</h5>
+            <p class="card-text small text-muted"
+               data-en="I draw, paint and code tools to share it — like my own art gallery or side web projects."
+               data-pl="Rysuję, maluję i koduję narzędzia, żeby to pokazać — jak własna galeria czy poboczne projekty webowe.">
+              I draw, paint and code tools to share it — like my own art gallery or side web projects.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+
+
+<!-- Projects Section -->
+<section id="projects" class="container" data-aos="fade-up">
+  <h2 data-en="Projects" data-pl="Projekty">Projects</h2>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+
+    {% for project in projects %}
+    <div class="col">
+      <div class="card h-100 shadow-sm border-0 project-card text-center">
+
+        <!-- IMAGE -->
+        {% if project.image %}
+        <img src="{{ project.image.url }}" class="card-img-top project-thumb" alt="{{ project.title_en }}">
+        {% else %}
+        <div class="project-thumb placeholder d-flex align-items-center justify-content-center">
+          <i class="fas fa-code fa-2x text-muted"></i>
+        </div>
+        {% endif %}
+
+        <!-- BODY -->
+        <div class="card-body d-flex flex-column justify-content-between">
+          <div>
+            <h5 class="card-title" data-en="{{ project.title_en }}" data-pl="{{ project.title_pl }}">
+              {{ project.title_en }}
+            </h5>
+            <p class="card-text small text-muted" data-en="{{ project.desc_en }}" data-pl="{{ project.desc_pl }}">
+              {{ project.desc_en }}
+            </p>
+          </div>
+
+          <!-- LINKS -->
+          <div class="mt-3">
+            {% if project.github_url %}
+              <a href="{{ project.github_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-dark me-1">
+                <i class="fab fa-github"></i> GitHub
+              </a>
+            {% endif %}
+            {% if project.live_url %}
+              <a href="{{ project.live_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-external-link-alt"></i> Live
+              </a>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+    {% empty %}
+      <p class="text-muted">No projects yet.</p>
+    {% endfor %}
+
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="container" data-aos="fade-up">
+  <h2 data-en="Contact" data-pl="Kontakt">Contact</h2>
+  <p data-en="Want to build something or ask a question? Drop me a message:"
+     data-pl="Masz pomysł lub pytanie? Wyślij wiadomość:">
+     Want to build something or ask a question? Drop me a message:
+  </p>
+
+  {% if messages %}
+  <div class="alert-container">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message|safe }}
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" class="row g-3 mt-3">
+    {% csrf_token %}
+    <div class="col-md-6">
+      {{ form.name }}
+    </div>
+    <div class="col-md-6">
+      {{ form.email }}
+    </div>
+    <div class="col-12">
+      {{ form.message }}
+    </div>
+    <div class="col-12 text-end">
+      <button type="submit" class="btn btn-dark">
+        <span data-en="Send Message" data-pl="Wyślij wiadomość">Send Message</span>
+      </button>
+    </div>
+  </form>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <p>© 2025 Walery — All rights reserved</p>
+    <div class="social-icons">
+      <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+	  <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+	  <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="{% static 'core/js/lang.js' %}" defer></script>
+<script src="{% static 'core/js/nav.js' %}" defer></script>
+<script src="{% static 'core/js/navbar.js' %}" defer></script>
+<script src="{% static 'core/js/matrix.js' %}" defer></script>
+<script>
+  setTimeout(() => {
+      document.querySelectorAll('.alert').forEach(alert => {
+          alert.style.transition = 'opacity 0.5s';
+          alert.style.opacity = '0';
+          setTimeout(() => alert.style.display = 'none', 500);
+      });
+  }, 5000);
+</script>
+</body>
+</html>
