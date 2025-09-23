@@ -6,6 +6,7 @@ from django.conf import settings
 import logging
 from .forms import ContactForm
 from django.urls import reverse
+from .models import Project
 
 logger = logging.getLogger(__name__)
 
@@ -14,10 +15,15 @@ class HomeView(View):
 
     def get(self, request):
         form = ContactForm()
-        return render(request, self.template_name, {'form': form})
+        projects = Project.objects.all()
+        return render(request, self.template_name, {
+            'form': form,
+            'projects': projects
+        })
 
     def post(self, request):
         form = ContactForm(request.POST)
+        projects = Project.objects.all()
         if form.is_valid():
             try:
                 form.save()
@@ -53,4 +59,7 @@ class HomeView(View):
 
             return redirect(f"{reverse('home')}#contact")
 
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {
+            'form': form,
+            'projects': projects
+        })
