@@ -72,11 +72,16 @@ def main(request):
         return HttpResponse("Internal Server Error", status=500)
 
 
-# Initialize chatbot instance
-chatbot_instance = Chatbot()
+# singleton holder
+_chatbot_instance = None
+
+def get_chatbot():
+    global _chatbot_instance
+    if _chatbot_instance is None:
+        _chatbot_instance = Chatbot()
+    return _chatbot_instance
 
 
-# Asynchronous view for handling chatbot responses
 async def chatbot(request):
     try:
         user_input = request.GET.get('message', '')
@@ -87,8 +92,8 @@ async def chatbot(request):
         if cached_response:
             return JsonResponse({'response': cached_response})
 
-        response = await sync_to_async(chatbot_instance.get_response)(user_input)
-        cache.set(user_input, response, timeout=3600)  # cache for 1 hour
+        response = await sync_to_async(get_chatbot().get_response)(user_input)
+        cache.set(user_input, response, timeout=3600)
         return JsonResponse({'response': response})
     except Exception as e:
         sentry_sdk.capture_exception(e)

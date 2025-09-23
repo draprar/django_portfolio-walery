@@ -16,11 +16,7 @@ class Chatbot:
     """
 
     def __init__(self):
-        """
-        Initialize the chatbot with predefined keywords and sentiment words.
-        """
-        self.nlp = spacy.load("pl_core_news_sm")
-
+        self._nlp = None  # lazy init
         self.keyword_responses = self.load_data("tonguetwister/data/keywords.pkl")
         self.negative_words = self.load_data("tonguetwister/data/negative_words.pkl")
         self.positive_words = self.load_data("tonguetwister/data/positive_words.pkl")
@@ -30,9 +26,15 @@ class Chatbot:
         self.positive_pattern = re.compile(r'\b(?:' + '|'.join(map(re.escape, self.positive_words)) + r')\b',
                                            re.IGNORECASE)
 
+    @property
+    def nlp(self):
+        """Lazy load spaCy model on first access."""
+        if self._nlp is None:
+            self._nlp = spacy.load("pl_core_news_sm")
+        return self._nlp
+
     @staticmethod
     def load_data(filepath):
-        """Loads data from a pickle file."""
         try:
             with open(filepath, "rb") as f:
                 return pickle.load(f)
@@ -41,15 +43,11 @@ class Chatbot:
             return {} if 'keywords' in filepath else set()
 
     def save_unanswered_questions(self, redis_key="chatbot:unanswered_questions", flush_threshold=5):
-        """Saves unanswered questions to Redis."""
         if len(self.unanswered_questions) % flush_threshold == 0:
             cache.set(redis_key, pickle.dumps(self.unanswered_questions), timeout=None)
 
     def lemmatize_input(self, text):
-        """
-        Lemmatizes user text using SpaCy to simplify keyword searching.
-        """
-        doc = self.nlp(text.lower())
+        doc = self.nlp(text.lower())  # spaCy
         return " ".join([token.lemma_ for token in doc])
 
     def get_custom_sentiment(self, user_input):
