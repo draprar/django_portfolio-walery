@@ -1,0 +1,16 @@
+{% load static %}
+{% if user.is_authenticated %}
+<h1><span class="justify-content-center text-center m-auto">Czołem, <strong>{{ user.username }}</strong>! To Twój <strong>{{ user.profile.login_streak }}</strong> dzień z nami! 🔥</span></h1>
+<p class="col-md-16 fs-4">Bardzo cieszymy się na wieść o Twoim powrocie! <br><img src="{% static 'tonguetwister/assets/ttlogo.png' %}" alt="" width="28" height="28" class="d-inline-block align-text-top"> <strong>LingwoŁamki</strong> mogą znowuż wesprzeć Cię ćwiczeniami artykulacyjnymi 👄 głosowymi 🗣️ oraz oddechowymi 🥱 Usłysz swój głos 🎤 <br>Nabierz lekkości oraz swobody w mówieniu do siebie i innych.</p>
+<div class="card text-white bg-secondary mt-3 mb-3 w-100">
+    <div class="card-body"><p class="text-center mb-0">Zaczynamy? 🚀 Śmiało, przesuń palcem lub przeciągnij myszką ➡️</p></div>
+</div>
+<p class="col-md-16 fs-4">🛡 W wolnej chwili możesz też rozejrzeć się po swoim profilu.</p>
+{% else %}
+<h1><strong>KŁANIAMY SIĘ! 🤓</strong></h1>
+<p class="col-md-16 fs-4">Marzysz o tym, aby Twój głos był silny, a słowa wyraźnie docierały do wszystkich? 💬 Dobrze, że tu jesteś! <img src="{% static 'tonguetwister/assets/ttlogo.png' %}" alt="" width="28" height="28" class="d-inline-block align-text-top"> <strong>LingwoŁamki</strong> to aplikacja, która ma dla Ciebie zestaw ćwiczeń artykulacyjnych 👄 głosowych 🗣️ oraz oddechowych 🥱 Usłysz swój głos 🎤 <br>Nabierz lekkości oraz swobody w mówieniu do siebie i innych.</p>
+<div class="card text-white bg-secondary mt-3 mb-3 w-100">
+    <div class="card-body"><p class="text-center mb-0">Zaczynamy? 🚀 Śmiało, przesuń palcem lub przeciągnij myszką ➡️</p></div>
+</div>
+<p class="col-md-16 fs-4">🛡 Zarejestruj się i stwórz swój profil, gdzie będziesz dodawać oraz drukować swoje ulubione ćwiczenia do powtórek. Uzbrój się w kolejne językowe umiejętności. </p>
+{% endif %}

@@ -1,0 +1,55 @@
+{% load static %}
+<h1><strong>CZAS NA ROZGRZEWKĘ 🤼</strong></h1>
+<div class="step" id="step-1">
+    <p class="col-md-16 fs-4"><strong>Wykonaj 5 ruchów głową</strong> w przód i tył ↕️ a jak dasz radę, kolejne 5 w lewo i prawo ‍↔️</p>
+    <button id="next-button-1" class="btn btn-dark btn-lg text-uppercase fw-bold">Potrzebuję rozgrzać się bardziej</button>
+</div>
+
+<div id="step-2" class="step" style="display: none;">
+    <p class="col-md-16 fs-4">Twój głos zabrzmi teraz lepiej. Sprawdź to - <strong>zacznij … ziewać!</strong> 🥱<br>Otwórz szeroko buzię, przeciągnij się, pozwól sobie wydać kilka dzikich dźwięków 😮‍💨 Możesz też zacząć mlaskać albo mruczeć 😸</p>
+    <button id="next-button-2" class="btn btn-dark btn-lg text-uppercase fw-bold">Potrzebuję rozgrzać się bardziej</button>
+</div>
+
+<div id="step-3" class="step" style="display: none;">
+    <p class="col-md-16 fs-4">Aby jeszcze lepiej przygotować do ćwiczeń, kliknij poniżej i przeczytaj na głos porady językowe 💡</p>
+    <img src="{% static 'tonguetwister/assets/arrows.svg' %}" alt="" width="24" height="24" class="d-inline-block align-text-top"><br>
+    <div id="trivia-container">
+        {% for x in trivia %}
+            <div class="trivia col-md-16 fs-4 bg-light bg-gradient text-center shadow-sm p-3 my-3 rounded border">{{ x.text }}</div>
+        {% endfor %}
+    </div>
+    <br>
+    <button id="load-more-trivia-btn" class="btn btn-dark btn-lg text-uppercase fw-bold" data-offset="{{ trivia|length }}" data-url="{% url 'load_more_trivia' %}" onclick="changeTriviaButtonText()">Porada językowa</button>
+</div>
+
+<div id="congratulations-modal-trivia" class="card text-white bg-secondary mt-3 mb-3 w-100 shadow" style="display: none;">
+    <audio id="success-sound-trivia" src="{% static 'tonguetwister/sounds/fanfare.mp3' %}" preload="auto"></audio>
+    <div class="card-body">
+        <p class="card-text text-center mb-0">Ładnie! 👏 Baza porad wyczyszczona, możemy iść dalej 💣</p>
+    </div>
+</div>
+
+<div id="slide-arrow-container" style="display: none;">
+  <span id="slide-specific-arrow" class="highlight">➔</span>
+</div>
+<script src="{% static 'tonguetwister/js/loadMoreBonuses.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    var step1 = document.getElementById('step-1');
+    var step2 = document.getElementById('step-2');
+    var step3 = document.getElementById('step-3');
+
+    var nextButton1 = document.getElementById('next-button-1');
+    var nextButton2 = document.getElementById('next-button-2');
+
+    nextButton1.addEventListener('click', function () {
+        step1.style.display = 'none'; // Hide step 1
+        step2.style.display = 'block'; // Show step 2
+    });
+
+    nextButton2.addEventListener('click', function () {
+        step2.style.display = 'none'; // Hide step 2
+        step3.style.display = 'block'; // Show step 3
+    });
+});
+</script>

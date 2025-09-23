@@ -1,0 +1,61 @@
+{% load static %}
+<nav class="navbar navbar-dark bg-dark">
+  <div class="container-fluid">
+    <div class="d-flex align-items-center">
+        <a class="navbar-brand" href="/tonguetwister/"><img src="{% static 'tonguetwister/assets/ttlogo.png' %}" alt="" width="28" height="28" class="d-inline-block align-text-top"> LingwoŁamki</a>
+    </div>
+    <div class="ml-auto">
+      {% if user.is_authenticated %}
+        {% if user.profile.avatar %}
+          <a class="btn" href="{% url 'user_content' %}" aria-label="user"><img src="{{ user.profile.avatar.url }}" alt="avatar" class="rounded-circle" width="24" height="24"></a>
+        {% else %}
+          <a class="btn btn-outline-secondary d-none d-lg-inline" href="{% url 'user_content' %}" style="color: white;">Profil</a>
+          <a class="btn btn-outline-secondary d-lg-none" href="{% url 'user_content' %}" aria-label="user"><img src="{% static 'tonguetwister/assets/profile.svg' %}" alt="" width="24" height="24" class="d-inline-block align-text-top"></a>
+        {% endif %}
+        <!-- Desktop Wyloguj -->
+        <a class="btn btn-outline-secondary d-none d-lg-inline me-1"
+           href="#"
+           onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+           style="color: white;">
+          Wyloguj
+        </a>
+        <!-- Mobile Wyloguj-->
+        <a class="btn btn-outline-secondary d-lg-none me-1"
+           href="#"
+           aria-label="logout"
+           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+          <img src="{% static 'tonguetwister/assets/logout.svg' %}"
+               alt="" width="24" height="24" class="d-inline-block align-text-top">
+        </a>
+        <!-- Hidden logout form -->
+        <form id="logout-form" method="post" action="{% url 'logout' %}" style="display:none;">
+          {% csrf_token %}
+        </form>
+        <a class="btn btn-outline-secondary d-none d-lg-inline"
+           href="{% url 'home' %}#contact" style="color: white;">Kontakt</a>
+        <a class="btn btn-outline-secondary d-lg-none"
+           href="{% url 'home' %}#contact" aria-label="contact">
+           <img src="{% static 'tonguetwister/assets/envelope.svg' %}"
+                alt="" width="24" height="24" class="d-inline-block align-text-top">
+        </a>
+        {% include 'tonguetwister/partials/static/audio.html' %}
+        {% if user.is_superuser %}
+        <a class="btn btn-outline-secondary d-none d-lg-inline" href="{% url 'content_management' %}" style="color: white;">Kontent</a>
+        <a class="btn btn-outline-secondary d-lg-none" href="{% url 'content_management' %}" aria-label="content_management">
+           <img src="{% static 'tonguetwister/assets/settings.svg' %}" alt="" width="24" height="24" class="d-inline-block align-text-top">
+        </a>
+        {% endif %}
+        {% else %}
+        <a class="btn btn-outline-secondary d-none d-lg-inline" href="{% url 'login' %}" style="color: white;" id="login">Logowanie</a>
+        <a class="btn btn-outline-secondary d-lg-none" href="{% url 'login' %}" aria-label="login" id="login-mobile">
+           <img src="{% static 'tonguetwister/assets/login.svg' %}" alt="" width="24" height="24" class="d-inline-block align-text-top">
+        </a>
+        <a class="btn btn-outline-secondary d-none d-lg-inline" href="{% url 'home' %}#contact" style="color: white;" id="contact">Kontakt</a>
+        <a class="btn btn-outline-secondary d-lg-none" href="{% url 'home' %}#contact" aria-label="contact-mobile" id="contact-mobile">
+           <img src="{% static 'tonguetwister/assets/envelope.svg' %}" alt="" width="24" height="24" class="d-inline-block align-text-top">
+        </a>
+        {% include 'tonguetwister/partials/static/audio.html' %}
+        {% endif %}
+    </div>
+  </div>
+</nav>

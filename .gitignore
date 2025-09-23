@@ -1,0 +1,57 @@
+# === PYTHON / DJANGO ===
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+*.egg-info/
+.eggs/
+*.coverage
+.coverage.*
+.cache
+.pytest_cache/
+
+# Local settings
+local_settings.py
+
+# === DATABASES ===
+*.sqlite3
+*.sqlite3-journal
+
+# === ENVIRONMENT ===
+/myvenv
+/env
+/.venv
+venv/
+ENV/
+*.env
+.env.*
+
+# === DJANGO PROJECT FILES ===
+# Media & user uploads (store elsewhere in prod!)
+media/
+
+# === SYSTEM ===
+*~
+.DS_Store
+Thumbs.db
+
+# === IDE / EDITORS ===
+# PyCharm
+.idea/
+*.iml
+# VS Code
+.vscode/
+
+# === RENDER / DEPLOY ===
+# Node stuff if you ever add frontend tooling
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Build artifacts
+build/
+dist/
