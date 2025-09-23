@@ -30,6 +30,12 @@
     <!-- LEWO: Walery -->
     <a class="navbar-brand fw-bold mb-0" href="#">Walery</a>
 
+    <!-- BURGER (mobile) -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
     <!-- ŚRODEK: EN/PL (MOBILE) -->
     <div class="lang-switcher d-lg-none d-flex justify-content-center mx-auto my-0">
       <button class="btn btn-sm btn-outline-secondary me-1 lang-btn" data-lang="en" onclick="switchLang('en')">EN</button>
@@ -37,7 +43,7 @@
     </div>
 
     <!-- NAVIGATION -->
-    <div class="collapse navbar-collapse show" id="navbarNav"> <!-- show, żeby na desktopie burger nie działał -->
+    <div class="collapse navbar-collapse" id="navbarNav"> <!-- usunięte 'show' -->
       <ul class="navbar-nav me-auto w-100" id="navbarScrollSpy">
         <li class="nav-item"><a class="nav-link" href="#about" data-en="About" data-pl="O mnie">About</a></li>
         <li class="nav-item"><a class="nav-link" href="#services" data-en="What I Offer" data-pl="Oferta">What I Offer</a></li>
@@ -66,6 +72,7 @@
     </div>
   </div>
 </nav>
+
 
 
 
