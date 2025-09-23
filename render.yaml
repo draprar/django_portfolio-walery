@@ -10,7 +10,7 @@ services:
       python manage.py migrate --noinput
       python manage.py collectstatic --noinput
     startCommand: |
-      python manage.py runserver 0.0.0.0:8000
+      gunicorn config.wsgi:application --workers 1 --log-file
     envVars:
       - key: DJANGO_DEBUG
         value: "False"
