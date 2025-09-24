@@ -231,17 +231,15 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # --- Supabase (S3-compatible) via django-storages ---
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-
 AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
-AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME", default="media")
+AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")
+SUPABASE_PROJECT_REF = env("SUPABASE_PROJECT_REF")
 
-# Explicit Supabase S3-compatible endpoint (override via env if needed)
-AWS_S3_ENDPOINT_URL = env(
-    "AWS_S3_ENDPOINT_URL",
-    default="https://fovmqjulcvslfnjnbjoj.storage.supabase.co"
-)
+AWS_S3_ENDPOINT_URL = f"https://{SUPABASE_PROJECT_REF}.supabase.co/storage/v1/s3"
+
+# Public URL for use in templates (Supabase public object URL)
+MEDIA_URL = f"https://{SUPABASE_PROJECT_REF}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}/"
 
 # Options
 AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME", default=None)
@@ -250,16 +248,14 @@ AWS_S3_SIGNATURE_VERSION = "s3v4"
 AWS_DEFAULT_ACL = None
 AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "public, max-age=86400"}
 
-# Public URL for use in templates (Supabase public object URL)
-MEDIA_URL = f"https://{env('SUPABASE_PROJECT_REF')}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}/"
-
-'''
 STORAGES = {
-    'staticfiles': {
-        "BACKEND": 'whitenoise.storage.CompressedManifestStaticFilesStorage',
-    }
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
 }
-'''
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -280,3 +276,6 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="webmaster@localhost")
 LOGIN_URL = "/admin/login/"
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "main"
+
+from django.core.files.storage import default_storage
+print(">>> DEFAULT STORAGE:", default_storage.__class__)
