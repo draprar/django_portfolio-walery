@@ -12,4 +12,6 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # serve static files in debug using static() only if needed
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    # NOTE: we DO NOT serve MEDIA via Django static() because MEDIA is in Supabase.

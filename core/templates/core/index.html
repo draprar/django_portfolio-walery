@@ -10,12 +10,12 @@
   <meta property="og:type" content="website" />
   <title>Walery | Portfolio</title>
   <meta name="description" content="Walery — engineer, programmer & creative mind. Web automation, analysis and custom tooling.">
-  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+  <link rel="icon" href="{% static 'core/img/favicon.ico' %}" type="image/x-icon" />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
-  <link rel="canonical" href="https://!!!!!" />
+  <link rel="canonical" href="https://walery.onrender.com" />
   <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
 </head>
 <body>
@@ -73,9 +73,6 @@
   </div>
 </nav>
 
-
-
-
 <!-- Desktop Split Section -->
 <section class="split-section">
   <div class="half left" aria-hidden="true" aria-label="Engineer side – code, automation, analysis">
@@ -124,7 +121,7 @@
   <h2 data-en="Who I am" data-pl="O mnie">Who I am</h2>
 
   <p data-en="Hey there! I’m Walery — an engineer, programmer and analyst with over a decade of experience in production, electrical and telecom fields, plus a few years of practice in Python, data and automation. Day to day I handle technical stuff: from Python and ML, through data flows and automations, reports, audits and design, all the way to custom-built tools."
-     data-pl="Serwus! Jestem Walery — inżynier, programista i analityk z ponad dekadą doświadczenia w produkcji, elektryce i telekomunikacji oraz kilkuletnią praktyką w Pythonie, danych i automatyzacji. Na co dzień ogarniam techniczne tematy: od Pythona i ML, przez przepływy danych i automaty, raporty, audyty i projektowanie, aż po narzędzia szyte na miarę.">
+     data-pl="Cześć! Jestem Walery — inżynier, programista i analityk z ponad dekadą doświadczenia w produkcji, elektryce i telekomunikacji oraz kilkuletnią praktyką w Pythonie, danych i automatyzacji. Na co dzień ogarniam techniczne tematy: od Pythona i ML, przez przepływy danych i automaty, raporty, audyty i projektowanie, aż po narzędzia szyte na miarę.">
     Hey there! I’m Walery — an engineer, programmer and analyst with over a decade of experience in production, electrical and telecom fields, plus a few years of practice in Python, data and automation. Day to day I handle technical stuff: from Python and ML, through data flows and automations, reports, audits and design, all the way to custom-built tools.
   </p>
 
@@ -138,6 +135,7 @@
     After hours I draw, paint and build my own web projects — like an art gallery or a tongue-twister platform. This site is both my portfolio and part of a modular Django platform I’m developing. Below are the areas I move in — all tied together by one thing: I like building stuff that works.
   </p>
 </section>
+
 <!-- Services Section -->
 <section id="services" class="container" data-aos="fade-up">
   <h2 data-en="What I Can Help With" data-pl="W czym mogę pomóc">What I Can Help With</h2>
@@ -242,9 +240,6 @@
   </div>
 </section>
 
-
-
-
 <!-- Projects Section -->
 <section id="projects" class="container" data-aos="fade-up">
   <h2 data-en="Projects" data-pl="Projekty">Projects</h2>
@@ -256,11 +251,18 @@
 
         <!-- IMAGE -->
         {% if project.image %}
-        <img src="{{ project.image.url }}" class="card-img-top project-thumb" alt="{{ project.title_en }}">
+        <img
+          src="{{ project.image.url }}"
+          class="card-img-top project-thumb"
+          alt="{{ project.title_en|default:project.title_pl }}"
+          loading="lazy"
+          decoding="async"
+          onerror="this.onerror=null; this.style.display='none';"
+        >
         {% else %}
-        <div class="project-thumb placeholder d-flex align-items-center justify-content-center">
-          <i class="fas fa-code fa-2x text-muted"></i>
-        </div>
+          <div class="project-thumb placeholder d-flex align-items-center justify-content-center">
+            <i class="fas fa-code fa-2x text-muted"></i>
+          </div>
         {% endif %}
 
         <!-- BODY -->

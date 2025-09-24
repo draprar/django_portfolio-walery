@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}walerydocholery{% endblock %}</title>
+    <title>{% block title %}Walery{% endblock %}</title>
 
     <!-- Favicon -->
     <link rel="icon" href="{% static 'gallery/img/logo.ico' %}" type="image/x-icon">
@@ -28,9 +28,9 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
-        <a class="navbar-brand" href="{% url 'home' %}">
+        <a class="navbar-brand" href="#">
             <img src="{% static 'gallery/img/logo.png' %}" alt="Logo" width="32" height="32">
-            walerydocholery
+            Walery
         </a>
         <button class="navbar-toggler custom-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -41,17 +41,17 @@
                 <!-- "All" Category -->
                 <li class="nav-item">
                     <a class="nav-link
-                        {% if request.resolver_match.url_name == 'home' %}
+                        {% if request.resolver_match.url_name == 'gallery_home' %}
                             {% if not selected_category or selected_category == 'All' %}active{% endif %}
                         {% endif %}"
-                        href="{% url 'home' %}">All</a>
+                        href="{% url 'gallery_home' %}">All</a>
                 </li>
 
                 <!-- Dynamic Categories -->
                 {% for category in categories %}
                 <li class="nav-item">
                     <a class="nav-link {% if selected_category == category.title %}active{% endif %}"
-                        href="{% url 'home' %}?category={{ category.title }}">
+                        href="{% url 'gallery_home' %}?category={{ category.title }}">
                         {{ category.title }}
                     </a>
                 </li>

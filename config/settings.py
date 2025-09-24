@@ -226,13 +226,30 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 STATIC_URL = 'static/'
-# STATICFILES_DIRS = [BASE_DIR / 'static']
+# STATICFILES_DIRS = [BASE_DIR / 'core/static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-WHITENOISE_USE_FINDERS = True
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# --- Supabase (S3-compatible) storage for media (uploads) ---
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
+# Variables used by django-storages
+AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME", default="media")
+
+# Endpoint: prefer direct storage hostname for uploads; fallback to project supabase path.
+AWS_S3_ENDPOINT_URL = env("AWS_S3_ENDPOINT_URL", default=f"https://{env('SUPABASE_PROJECT_REF')}.supabase.co/storage/v1/s3")
+AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME", default=None)
+
+# Make generated URLs clean and public (no signed querystring)
+AWS_QUERYSTRING_AUTH = False
+AWS_DEFAULT_ACL = None
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+
+# Public URL prefix used in templates: Supabase public URL format:
+# https://<project_ref>.supabase.co/storage/v1/object/public/<bucket>/
+MEDIA_URL = f"https://{env('SUPABASE_PROJECT_REF')}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}/"
 
 '''
 STORAGES = {
