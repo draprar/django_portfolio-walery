@@ -276,6 +276,3 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="webmaster@localhost")
 LOGIN_URL = "/admin/login/"
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "main"
-
-from django.core.files.storage import default_storage
-print(">>> DEFAULT STORAGE:", default_storage.__class__)
