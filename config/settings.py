@@ -250,7 +250,7 @@ AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "public, max-age=86400"}
 
 STORAGES = {
     "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "BACKEND": "core.storages_backends.SupabasePublicStorage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
