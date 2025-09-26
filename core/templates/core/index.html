@@ -308,34 +308,21 @@
      Want to build something or ask a question? Drop me a message:
   </p>
 
-  {% if messages %}
-  <div class="alert-container">
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}">
-        {{ message|safe }}
-      </div>
-    {% endfor %}
-  </div>
-  {% endif %}
+  <div id="contact-alerts"></div>
 
-  <form method="post" class="row g-3 mt-3">
+  <form method="post" action="{% url 'contact' %}" class="row g-3 mt-3" id="contact-form">
     {% csrf_token %}
-    <div class="col-md-6">
-      {{ form.name }}
-    </div>
-    <div class="col-md-6">
-      {{ form.email }}
-    </div>
-    <div class="col-12">
-      {{ form.message }}
-    </div>
+    <div class="col-md-6">{{ form.name }}</div>
+    <div class="col-md-6">{{ form.email }}</div>
+    <div class="col-12">{{ form.message }}</div>
     <div class="col-12 text-end">
-      <button type="submit" class="btn btn-dark">
-        <span data-en="Send Message" data-pl="Wyślij wiadomość">Send Message</span>
-      </button>
+        <button type="submit" class="btn btn-dark">
+            <span data-en="Send Message" data-pl="Wyślij wiadomość">Send Message</span>
+        </button>
     </div>
   </form>
 </section>
+
 
 <footer class="footer">
   <div class="container">
@@ -354,14 +341,6 @@
 <script src="{% static 'core/js/nav.js' %}" defer></script>
 <script src="{% static 'core/js/navbar.js' %}" defer></script>
 <script src="{% static 'core/js/matrix.js' %}" defer></script>
-<script>
-  setTimeout(() => {
-      document.querySelectorAll('.alert').forEach(alert => {
-          alert.style.transition = 'opacity 0.5s';
-          alert.style.opacity = '0';
-          setTimeout(() => alert.style.display = 'none', 500);
-      });
-  }, 5000);
-</script>
+<script src="{% static 'core/js/contact.js' %}" defer></script>
 </body>
 </html>

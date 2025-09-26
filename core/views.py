@@ -1,11 +1,10 @@
 from django.views import View
-from django.shortcuts import render, redirect
-from django.contrib import messages
+from django.http import JsonResponse
 from django.core.mail import send_mail, BadHeaderError
 from django.conf import settings
+from django.shortcuts import render
 import logging
 from .forms import ContactForm
-from django.urls import reverse
 from .models import Project
 
 logger = logging.getLogger(__name__)
@@ -21,9 +20,13 @@ class HomeView(View):
             'projects': projects
         })
 
-    def post(self, request):
+
+class ContactView(View):
+    def post(self, request, *args, **kwargs):
+        if request.headers.get("x-requested-with") != "XMLHttpRequest":
+            return JsonResponse({"success": False, "message": "Invalid request."}, status=400)
+
         form = ContactForm(request.POST)
-        projects = Project.objects.all()
         if form.is_valid():
             try:
                 form.save()
@@ -34,32 +37,27 @@ class HomeView(View):
                     settings.DEFAULT_FROM_EMAIL,
                     [settings.EMAIL_HOST_USER],
                 )
-                messages.success(
-                    request,
-                    '<div data-en="Your message has been sent successfully!" '
-                    'data-pl="Twoja wiadomość została wysłana pomyślnie!">'
-                    'Your message has been sent successfully!</div>'
-                )
+                return JsonResponse({
+                    "success": True,
+                    "message": "Your message has been sent successfully!"
+                })
             except BadHeaderError as e:
                 logger.error(f"BadHeaderError: {e}")
-                messages.error(
-                    request,
-                    '<div data-en="Invalid header found." '
-                    'data-pl="Wykryto nieprawidłowy nagłówek.">'
-                    'Invalid header found.</div>'
-                )
+                return JsonResponse({
+                    "success": False,
+                    "message": "Invalid header found."
+                }, status=500)
             except Exception as e:
                 logger.error(f"Error sending email: {e}")
-                messages.error(
-                    request,
-                    '<div data-en="An error occurred while sending the email. Please try again later." '
-                    'data-pl="Wystąpił błąd podczas wysyłania wiadomości. Spróbuj ponownie później.">'
-                    'An error occurred while sending the email. Please try again later.</div>'
-                )
+                return JsonResponse({
+                    "success": False,
+                    "message": "An error occurred while sending the email. Please try again later."
+                }, status=500)
 
-            return redirect(f"{reverse('home')}#contact")
-
-        return render(request, self.template_name, {
-            'form': form,
-            'projects': projects
-        })
+        # zwracamy pierwsze błędy z form.errors
+        errors = {field: list(errs) for field, errs in form.errors.items()}
+        return JsonResponse({
+            "success": False,
+            "message": "Invalid form data.",
+            "errors": errors
+        }, status=400)

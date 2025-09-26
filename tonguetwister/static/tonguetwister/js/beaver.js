@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Fetch new Old Polish record and display it in the speech bubble
         function fetchNewRecord() {
-            fetch(`/load-more-old-polish/`)
+            fetch(`/tonguetwister/load-more-old-polish/`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.length > 0) {

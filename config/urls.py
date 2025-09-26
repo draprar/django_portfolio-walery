@@ -8,7 +8,7 @@ urlpatterns = [
     path('', include('core.urls')),             # portfolio landing page
     path('gallery/', include('gallery.urls')),  # gallery
     path('rugby/', include('rugby.urls')),       # rugby
-    path('tonguetwister/', include('tonguetwister.urls'))  # rugby
+    path('tonguetwister/', include('tonguetwister.urls'))  # tonguetwister
 ]
 
 if settings.DEBUG:
