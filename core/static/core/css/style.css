@@ -198,14 +198,24 @@
 
 @media (max-width: 768px) {
   .split-section {
-    flex-wrap: wrap;
+    flex-direction: row;
+    flex-wrap: wrap-reverse;
     height: auto;
   }
 
   .half {
     width: 50%;
-    height: auto;
-    background-size: contain;
+    height: 40vh;
+    background-size: auto 100%;   /* jak na desktopie */
+    background-repeat: no-repeat;
+  }
+
+  .left {
+    background-position: right center; /* przyklei lewy obraz do środka */
+  }
+
+  .right {
+    background-position: left center;  /* przyklei prawy obraz do środka */
   }
 
   .text-box {
