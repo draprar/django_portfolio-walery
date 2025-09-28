@@ -64,7 +64,7 @@ urlpatterns = [
     path('delete-exercise/<int:exercise_id>/', views.delete_exercise, name='delete_exercise'),
     path('add-twister/<int:twister_id>/', views.add_twister, name='add_twister'),
     path('delete-twister/<int:twister_id>/', views.delete_twister, name='delete_twister'),
-    path('contact/', views.contact, name='contact'),
+    #path('contact/', views.contact, name='contact'),
     path('chatbot/', views.chatbot, name='chatbot'),
     path('api/', include(router.urls)),
     path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),

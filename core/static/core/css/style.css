@@ -198,14 +198,13 @@
 
 @media (max-width: 768px) {
   .split-section {
-    flex-direction: row;
-    flex-wrap: wrap-reverse;
+    flex-wrap: wrap;
     height: auto;
   }
 
   .half {
     width: 50%;
-    height: 40vh;
+    height: auto;
     background-size: contain;
   }
 

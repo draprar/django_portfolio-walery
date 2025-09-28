@@ -20,10 +20,14 @@ class HomeView(View):
             'projects': projects
         })
 
-
 class ContactView(View):
     def post(self, request, *args, **kwargs):
+        logger.debug("ContactView called")
+        logger.debug("Headers: %s", dict(request.headers))
+        logger.debug("POST data: %s", request.POST)
+
         if request.headers.get("x-requested-with") != "XMLHttpRequest":
+            logger.warning("Invalid request: missing XHR header")
             return JsonResponse({"success": False, "message": "Invalid request."}, status=400)
 
         form = ContactForm(request.POST)
@@ -37,25 +41,26 @@ class ContactView(View):
                     settings.DEFAULT_FROM_EMAIL,
                     [settings.EMAIL_HOST_USER],
                 )
+                logger.info("Contact form saved and email sent")
                 return JsonResponse({
                     "success": True,
                     "message": "Your message has been sent successfully!"
                 })
             except BadHeaderError as e:
-                logger.error(f"BadHeaderError: {e}")
+                logger.error("BadHeaderError: %s", e)
                 return JsonResponse({
                     "success": False,
                     "message": "Invalid header found."
                 }, status=500)
             except Exception as e:
-                logger.error(f"Error sending email: {e}")
+                logger.exception("Error sending email")
                 return JsonResponse({
                     "success": False,
                     "message": "An error occurred while sending the email. Please try again later."
                 }, status=500)
 
-        # zwracamy pierwsze błędy z form.errors
         errors = {field: list(errs) for field, errs in form.errors.items()}
+        logger.warning("Form validation failed: %s", errors)
         return JsonResponse({
             "success": False,
             "message": "Invalid form data.",
