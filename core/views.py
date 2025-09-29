@@ -6,7 +6,6 @@ from django.shortcuts import render
 import logging
 from .forms import ContactForm
 from .models import Project
-from threading import Thread
 
 logger = logging.getLogger(__name__)
 
@@ -35,13 +34,20 @@ class ContactView(View):
         if form.is_valid():
             try:
                 form.save()
-                send_email_async(
-                    'New Portfolio Contact',
-                    f"Message from {form.cleaned_data['name']} "
-                    f"({form.cleaned_data['email']}):\n\n{form.cleaned_data['message']}",
-                    settings.DEFAULT_FROM_EMAIL,
-                    [settings.EMAIL_HOST_USER],
+
+                # Wysyłka synchroniczna
+                send_mail(
+                    subject='New Portfolio Contact',
+                    message=(
+                        f"Message from {form.cleaned_data['name']} "
+                        f"({form.cleaned_data['email']}):\n\n"
+                        f"{form.cleaned_data['message']}"
+                    ),
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[settings.EMAIL_HOST_USER],
+                    fail_silently=False,  # żeby logowało błędy
                 )
+
                 logger.info("Contact form saved and email sent")
                 return JsonResponse({
                     "success": True,
@@ -67,13 +73,3 @@ class ContactView(View):
             "message": "Invalid form data.",
             "errors": errors
         }, status=400)
-
-def send_email_async(subject, message, from_email, recipient_list):
-    def _send():
-        try:
-            send_mail(subject, message, from_email, recipient_list)
-        except Exception as e:
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.exception("Error sending email asynchronously")
-    Thread(target=_send).start()
