@@ -6,6 +6,7 @@ from django.shortcuts import render
 import logging
 from .forms import ContactForm
 from .models import Project
+from threading import Thread
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +35,7 @@ class ContactView(View):
         if form.is_valid():
             try:
                 form.save()
-                send_mail(
+                send_email_async(
                     'New Portfolio Contact',
                     f"Message from {form.cleaned_data['name']} "
                     f"({form.cleaned_data['email']}):\n\n{form.cleaned_data['message']}",
@@ -66,3 +67,13 @@ class ContactView(View):
             "message": "Invalid form data.",
             "errors": errors
         }, status=400)
+
+def send_email_async(subject, message, from_email, recipient_list):
+    def _send():
+        try:
+            send_mail(subject, message, from_email, recipient_list)
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.exception("Error sending email asynchronously")
+    Thread(target=_send).start()
