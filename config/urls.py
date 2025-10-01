@@ -11,6 +11,8 @@ urlpatterns = [
     path('tonguetwister/', include('tonguetwister.urls'))  # tonguetwister
 ]
 
+handler404 = "config.views.custom_404_view"
+
 if settings.DEBUG:
     # serve static files in debug using static() only if needed
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
