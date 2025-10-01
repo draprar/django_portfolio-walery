@@ -265,6 +265,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email backend settings (using SMTP)
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+BREVO_API_KEY = env("BREVO_API_KEY ", default="")
 EMAIL_HOST = env("EMAIL_HOST", default="")
 EMAIL_PORT = env.int("EMAIL_PORT", default=587)
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)

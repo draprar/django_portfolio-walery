@@ -1,11 +1,12 @@
 from django.views import View
 from django.http import JsonResponse
-from django.core.mail import send_mail, BadHeaderError
 from django.conf import settings
 from django.shortcuts import render
 import logging
+
 from .forms import ContactForm
 from .models import Project
+from .email import send_brevo_email   # <- zamiast send_mail
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,7 @@ class HomeView(View):
             'form': form,
             'projects': projects
         })
+
 
 class ContactView(View):
     def post(self, request, *args, **kwargs):
@@ -35,30 +37,29 @@ class ContactView(View):
             try:
                 form.save()
 
-                # Wysyłka synchroniczna
-                send_mail(
-                    subject='New Portfolio Contact',
-                    message=(
-                        f"Message from {form.cleaned_data['name']} "
-                        f"({form.cleaned_data['email']}):\n\n"
-                        f"{form.cleaned_data['message']}"
-                    ),
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[settings.EMAIL_HOST_USER],
-                    fail_silently=False,  # żeby logowało błędy
-                )
+                subject = "New Portfolio Contact"
+                html_content = f"""
+                    <h2>Message from {form.cleaned_data['name']}</h2>
+                    <p><strong>Email:</strong> {form.cleaned_data['email']}</p>
+                    <p>{form.cleaned_data['message']}</p>
+                """
+                recipient_list = [settings.DEFAULT_FROM_EMAIL]  # możesz zmienić na swój adres
 
-                logger.info("Contact form saved and email sent")
-                return JsonResponse({
-                    "success": True,
-                    "message": "Your message has been sent successfully!"
-                })
-            except BadHeaderError as e:
-                logger.error("BadHeaderError: %s", e)
-                return JsonResponse({
-                    "success": False,
-                    "message": "Invalid header found."
-                }, status=500)
+                result = send_brevo_email(subject, html_content, recipient_list)
+
+                if result:
+                    logger.info("Contact form saved and Brevo email sent")
+                    return JsonResponse({
+                        "success": True,
+                        "message": "Your message has been sent successfully!"
+                    })
+                else:
+                    logger.error("Brevo email sending failed")
+                    return JsonResponse({
+                        "success": False,
+                        "message": "Email service failed, please try again later."
+                    }, status=500)
+
             except Exception as e:
                 logger.exception("Error sending email")
                 return JsonResponse({
