@@ -1,28 +1,58 @@
 {% load static %}
-<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>404 — Page not found</title>
   <link rel="icon" href="{% static 'core/img/favicon.ico' %}" type="image/x-icon" />
-  <!-- korzystamy z Twojego głównego CSS, by zachować styl strony -->
+  <!-- główny CSS projektu -->
   <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+  <!-- font awesome (ikonki) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
   <style>
-    /* drobne dopasowanie wyglądu 404 (możesz przenieść do css jeśli chcesz) */
-    .error-hero { padding: 6rem 1rem; text-align: center; }
-    .error-code { font-size: 6rem; font-weight:700; margin: 0; }
-    .error-msg { font-size: 1.25rem; color: #555; margin: .5rem 0 1.2rem; }
-    .error-actions { margin-top: 1.25rem; }
-    .btn-ghost { background: transparent; border: 1px solid rgba(0,0,0,0.08); }
+    .error-hero {
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      padding: 3rem 1rem;
+    }
+    .error-code {
+      font-size: 7rem;
+      font-weight: 800;
+      color: var(--primary, #0d6efd);
+      margin-bottom: 0.5rem;
+      line-height: 1;
+    }
+    .error-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .error-msg {
+      font-size: 1.2rem;
+      color: #555;
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+    .error-actions .btn {
+      min-width: 180px;
+    }
   </style>
 </head>
 <body>
+  <!-- nawigacja -->
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container d-flex align-items-center justify-content-between">
       <a class="navbar-brand fw-bold mb-0" href="{% url 'home' %}">Walery</a>
-      <div class="collapse navbar-collapse">
-        <ul class="navbar-nav me-auto w-100">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#about">About</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#projects">Projects</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#contact">Contact</a></li>
@@ -31,29 +61,30 @@
     </div>
   </nav>
 
-  <main class="error-hero" style="margin-top:90px;">
+  <!-- sekcja hero 404 -->
+  <main class="error-hero">
     <div class="container">
-      <p class="error-code">404</p>
-      <h1 style="margin-top:0;">Page not found</h1>
-      <p class="error-msg">
-        Nie znaleziono strony: <strong>{{ request.path }}</strong><br>
-        Możesz wrócić na stronę główną albo wysłać wiadomość — chętnie pomogę.
-      </p>
-
-      <div class="error-actions">
-        <a class="btn btn-dark btn-lg me-2" href="{% url 'home' %}">Go to home</a>
-        <a class="btn btn-outline-secondary btn-lg" href="{% url 'contact' %}">Contact</a>
+      <div class="error-icon mb-3">
+        <i class="fa-solid fa-triangle-exclamation fa-3x text-danger"></i>
       </div>
-
-      <div style="margin-top:1.75rem; color:#777;">
-        Tip: sprawdź, czy adres nie zawiera literówki lub brakującego ukośnika.
+      <p class="error-code">404</p>
+      <h1 class="error-title">Page not found</h1>
+      <p class="error-msg">
+        Ups! Strona <strong>{{ request.path }}</strong> nie istnieje.<br>
+        Sprawdź adres lub skorzystaj z poniższych linków.
+      </p>
+      <div class="error-actions d-flex flex-column flex-sm-row gap-3 justify-content-center">
+        <a class="btn btn-dark btn-lg" href="{% url 'home' %}">
+          <i class="fa-solid fa-house"></i> Back to home
+        </a>
       </div>
     </div>
   </main>
 
-  <footer class="footer" style="margin-top:4rem;">
-    <div class="container">
-      <p>© 2025 Walery — All rights reserved</p>
+  <!-- stopka -->
+  <footer class="footer py-4">
+    <div class="container text-center">
+      <p class="mb-2">© 2025 Walery — All rights reserved</p>
       <div class="social-icons">
         <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
         <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
