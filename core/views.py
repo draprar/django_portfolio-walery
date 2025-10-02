@@ -10,6 +10,9 @@ from .email import send_brevo_email   # <- zamiast send_mail
 
 logger = logging.getLogger(__name__)
 
+def health_check(request):
+    return JsonResponse({"status": "ok"})
+
 class HomeView(View):
     template_name = 'core/index.html'
 
