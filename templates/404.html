@@ -45,14 +45,11 @@
   <!-- hero 404 -->
   <main class="error-hero">
     <div class="container">
-      <div class="error-icon mb-3">
-        <i class="fa-solid fa-triangle-exclamation fa-3x text-danger"></i>
-      </div>
       <p class="error-code">404</p>
       <h1 class="error-title">Page not found</h1>
       <p class="error-msg">
         Ups! Strona <strong>{{ request.path }}</strong> nie istnieje.<br>
-        Sprawdź adres lub skorzystaj z poniższych linków.
+        Sprawdź adres lub skorzystaj z poniższego linka, aby wrócić na stronę główną.
       </p>
       <div class="error-actions d-flex flex-column flex-sm-row gap-3 justify-content-center">
         <a class="btn btn-dark btn-lg" href="{% url 'home' %}">

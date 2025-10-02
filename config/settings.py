@@ -37,6 +37,7 @@ if SENTRY_DSN:
 
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["127.0.0.1", "localhost"])
 CSRF_TRUSTED_ORIGINS = env.list("DJANGO_CSRF_TRUSTED_ORIGINS", default=["http://localhost", "http://127.0.0.1"])
+CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["http://localhost", "http://127.0.0.1"])
 
 # Security & Session settings
 if not DEBUG:
@@ -59,7 +60,6 @@ if not DEBUG:
     SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -76,8 +76,8 @@ INSTALLED_APPS = [
 
     # External
     'rest_framework',
-    #'corsheaders',
-    #'drf_spectacular'
+    'corsheaders',
+    'drf_spectacular',
     'rest_framework_simplejwt',
     'django_extensions',
 ]
@@ -85,6 +85,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -92,7 +93,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     #'base.middleware.LoginStreakMiddleware',
-    #'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
