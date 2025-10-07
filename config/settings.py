@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'gallery',
     'tonguetwister',
     'rugby',
+    'bies',
 
     # External
     'rest_framework',

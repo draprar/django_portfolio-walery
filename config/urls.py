@@ -10,6 +10,8 @@ urlpatterns = [
     path('gallery/', include('gallery.urls')),  # gallery
     path('rugby/', include('rugby.urls')),       # rugby
     path('tonguetwister/', include('tonguetwister.urls')),  # tonguetwister
+    path('bies/', include('bies.urls')),        # bies
+
 
     # API
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

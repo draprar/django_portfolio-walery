@@ -1,0 +1,112 @@
+{% load static %}
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>чрьнъ бѣсъ – Czarny Diabeł</title>
+  <link rel="icon" type="image/png" href="{% static 'bies/favicon.png' %}">
+
+  <!-- Główne style -->
+  <link rel="stylesheet" href="{% static 'bies/style.css' %}">
+</head>
+
+<body>
+  <div class="container">
+    <div class="switch">
+      <button onclick="switchLang('pl')">PL</button>
+      <button onclick="switchLang('en')">EN</button>
+    </div>
+
+    <div class="ornament">⸻✦⸻</div>
+    <h1>
+      <span>ч</span><span>р</span><span>ь</span><span>н</span><span>ъ</span>
+      &nbsp;
+      <span>б</span><span>ѣ</span><span>с</span><span>ъ</span>
+    </h1>
+
+    <!-- POLISH -->
+    <div class="lang active" id="pl">
+      <p><strong>Porterówka – smakuje zajebiście 🖤👹.</strong></p>
+
+      <div class="section-title">Co te słowa znaczą?</div>
+      <p>
+        - <span class="highlight">чрьнъ</span> – stary zapis słowa „czarny”.<br>
+        - <span class="highlight">бѣсъ</span> – demon, zły duch; dawniej duch chaosu.
+      </p>
+
+      <div class="section-title">Co ten znak znaczy?</div>
+      <p>
+        Na etykiecie widzisz symbol <strong>Velesa (Welesa)</strong> – słowiańskiego boga opiekującego się bydłem, handlem, magią i światem podziemnym.
+        To znak mocy, opieki i przewodnictwa w chaosie – doskonale pasuje do charakteru <em>czarnej, gęstej porterówki</em> 🖤.
+      </p>
+
+      <ul>
+        <li>W mitologii słowiańskiej Veles był często przedstawiany jako wąż, niedźwiedź lub czarny byk.</li>
+        <li>Symbol noszono na amuletach, by chronił dom i gospodarstwo.</li>
+        <li>Był też opiekunem wiedzy i magii – stąd czarny kolor napoju.</li>
+      </ul>
+
+      <p class="small-note">
+        👉 Więcej o Velesie:
+        <a href="https://en.wikipedia.org/wiki/Veles_(god)" target="_blank">Wikipedia EN</a>,
+        <a href="https://pl.wikipedia.org/wiki/Weles" target="_blank">Wikipedia PL</a>.
+      </p>
+
+      <div class="section-title">Galeria manuskryptów</div>
+      <div class="gallery">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Codex_Suprasliensis.jpg/300px-Codex_Suprasliensis.jpg" alt="Codex Suprasliensis (X w.)">
+        <img src="https://www.wdl.org/en/item/10091/thumbnail/" alt="Codex Zographensis (X/XI w.)">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Codex_Marianus.jpg/300px-Codex_Marianus.jpg" alt="Codex Marianus (XI w.)">
+      </div>
+    </div>
+
+    <!-- ENGLISH -->
+    <div class="lang" id="en">
+      <p><strong>Porter liqueur – tastes f*cking great 🖤👹.</strong></p>
+
+      <div class="section-title">What do these words mean?</div>
+      <p>
+        - <span class="highlight">чрьнъ</span> – “black”, old spelling.<br>
+        - <span class="highlight">бѣсъ</span> – “demon / spirit of chaos”.
+      </p>
+
+      <div class="section-title">What does the symbol mean?</div>
+      <p>
+        On the label you’ll see the symbol of <strong>Veles</strong> – the Slavic god of cattle, trade, and the underworld.
+        A sign of protection and guidance through chaos – matching the dark soul of a porter 🖤.
+      </p>
+
+      <ul>
+        <li>Veles was often depicted as a serpent, bear, or black bull – symbols of raw nature.</li>
+        <li>His sign was worn as an amulet for protection.</li>
+        <li>Keeper of hidden knowledge and chaos.</li>
+      </ul>
+
+      <p class="small-note">
+        👉 Learn more:
+        <a href="https://en.wikipedia.org/wiki/Veles_(god)" target="_blank">Wikipedia EN</a>,
+        <a href="https://pl.wikipedia.org/wiki/Weles" target="_blank">Wikipedia PL</a>.
+      </p>
+
+      <div class="section-title">Manuscripts Gallery</div>
+      <div class="gallery">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Codex_Suprasliensis.jpg/300px-Codex_Suprasliensis.jpg" alt="Codex Suprasliensis (10th c.)">
+        <img src="https://www.wdl.org/en/item/10091/thumbnail/" alt="Codex Zographensis (10th/11th c.)">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Codex_Marianus.jpg/300px-Codex_Marianus.jpg" alt="Codex Marianus (11th c.)">
+      </div>
+    </div>
+
+    <div class="ornament">⸻✦⸻</div>
+
+    <!-- Lightbox -->
+    <div id="lightbox">
+      <span id="close">&times;</span>
+      <img id="lightbox-img" src="" alt="">
+      <div id="caption"></div>
+    </div>
+  </div>
+
+  <!-- Skrypt -->
+  <script src="{% static 'bies/main.js' %}"></script>
+</body>
+</html>
