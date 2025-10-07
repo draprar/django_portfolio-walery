@@ -22,8 +22,8 @@ body::before, body::after {
   opacity: 0.08;
   z-index: 0;
 }
-body::before { top: 1rem; left: 1rem; background-image: url('/static/bies/img/1.jpg'); }
-body::after { bottom: 1rem; right: 1rem; background-image: url('/static/bies/img/1.jpg'); transform: rotate(180deg); }
+body::before { top: 1rem; left: 1rem; background-image: url("../img/1.jpg"); }
+body::after { bottom: 1rem; right: 1rem; background-image: url("../img/1.jpg"); transform: rotate(180deg); }
 
 .container {
   width: 90%;
