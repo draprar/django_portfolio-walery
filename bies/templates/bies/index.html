@@ -1,20 +1,22 @@
 {% load static %}
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>чрьнъ бѣсъ – Czarny Diabeł</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>чрьнъ бѣсъ — Czarny Bies</title>
+  <meta name="description" content="чрьнъ бѣсъ — czarna porterówka inspirowana słowiańską estetyką. Etymologia, symbolika Velesa i galeria manuskryptów.">
   <link rel="stylesheet" href="{% static 'bies/css/style.css' %}">
 </head>
 
 <body>
   <div class="container">
     <div class="switch">
-      <button onclick="switchLang('pl')">PL</button>
-      <button onclick="switchLang('en')">EN</button>
+      <button type="button" onclick="switchLang('pl')">PL</button>
+      <button type="button" onclick="switchLang('en')">EN</button>
     </div>
 
     <div class="ornament">⸻✦⸻</div>
+
     <h1>
       <span>ч</span><span>р</span><span>ь</span><span>н</span><span>ъ</span>
       &nbsp;
@@ -23,77 +25,208 @@
 
     <!-- POLISH -->
     <div class="lang active" id="pl">
-      <p><strong>Porterówka – smakuje zajebiście 🖤👹.</strong></p>
+      <section class="section">
+        <div class="section-title">O co tu chodzi?</div>
+        <p>Zrodzona z miłości do ciemnych piw i słowiańskiej estetyki — <em>чрьнъ бѣсъ</em> (<strong>czarny bies</strong>) to porterówka: gęsta, palona, pełna charakteru. Nazwa przywołuje mit i surową poetykę dawnych słów — zaproszenie do smakowania historii.</p>
+      </section>
 
-      <div class="section-title">Co te słowa znaczą?</div>
-      <p>
-        - <span class="highlight">чрьнъ</span> – stary zapis słowa „czarny”.<br>
-        - <span class="highlight">бѣсъ</span> – demon, zły duch; dawniej duch chaosu.
-      </p>
+      <section class="section">
+        <div class="section-title">Co te słowa znaczą?</div>
+        <p><span class="highlight">чрьнъ</span> – stary zapis słowa „czarny”.<br>
+           <span class="highlight">бѣсъ</span> – bies, demon/duch chaosu; w dawnych znaczeniach także „szał” czy „obłęd”.</p>
 
-      <div class="section-title">Co ten znak znaczy?</div>
-      <p>
-        Na etykiecie widzisz symbol <strong>Velesa (Welesa)</strong> – słowiańskiego boga opiekującego się bydłem, handlem, magią i światem podziemnym.
-        To znak mocy, opieki i przewodnictwa w chaosie – doskonale pasuje do charakteru <em>czarnej, gęstej porterówki</em> 🖤.
-      </p>
+        <div class="etymology-grid">
+          <div class="box">
+            <h3>Transliteracja</h3>
+            <p><code>čьrnъ běsъ</code> → współcześnie: <strong>czarny bies</strong></p>
+          </div>
 
-      <ul>
-        <li>W mitologii słowiańskiej Veles był często przedstawiany jako wąż, niedźwiedź lub czarny byk.</li>
-        <li>Symbol noszono na amuletach, by chronił dom i gospodarstwo.</li>
-        <li>Był też opiekunem wiedzy i magii – stąd czarny kolor napoju.</li>
-      </ul>
+          <div class="box">
+            <h3>Skąd to się wzięło?</h3>
+            <ul>
+              <li><em>чрьнъ</em> → proto-słowiańskie <em>čьrnъ</em> → polskie <em>czarny</em>.</li>
+              <li><em>бѣsъ</em> → proto-słowiańskie <em>běsъ</em> → współczesne <em>bes / бeс</em>; pokrewne czasownikowi <em>běsiti</em> (w szał wpadać).</li>
+              <li>Litery takie jak <strong>ѣ</strong> (jat) oraz <strong>ъ/ь</strong> to elementy starego zapisu i miały różne realizacje fonetyczne w regionach.</li>
+            </ul>
+          </div>
 
-      <p class="small-note">
-        👉 Więcej o Velesie:
-        <a href="https://en.wikipedia.org/wiki/Veles_(god)" target="_blank">Wikipedia EN</a>,
-        <a href="https://pl.wikipedia.org/wiki/Weles" target="_blank">Wikipedia PL</a>.
-      </p>
+          <div class="box">
+            <h3>Ciekawostki</h3>
+            <ul>
+              <li><em>ѣ</em> (jat) często zmieniała brzmienie regionalnie i w większości języków zanikła.</li>
+              <li><em>ъ</em> i <em>ь</em> (jery) reprezentowały krótkie samogłoski, które później ewoluowały.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
-      <div class="section-title">Galeria manuskryptów</div>
-      <div class="gallery">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Codex_Suprasliensis.jpg/300px-Codex_Suprasliensis.jpg" alt="Codex Suprasliensis (X w.)">
-        <img src="https://www.wdl.org/en/item/10091/thumbnail/" alt="Codex Zographensis (X/XI w.)">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Codex_Marianus.jpg/300px-Codex_Marianus.jpg" alt="Codex Marianus (XI w.)">
-      </div>
+      <section class="section">
+        <div class="section-title">Co ten znak znaczy?</div>
+        <p>Na etykiecie widnieje symbol <strong>Velesa</strong> — bóstwa związanego z bydłem, handlem, magią i światem podziemnym. To znak opieki, siły i kontaktu z tajemnicą — doskonale pasuje do ciężkiej, czarnej porterówki.</p>
+
+        <ul>
+          <li>Veles bywał przedstawiany jako wąż, niedźwiedź lub byk — symbole siły i ziemi.</li>
+          <li>Jego znaki były noszone jako ochrona: dom, stado, dobrobyt.</li>
+          <li>Współczesne użycie to głównie reinterpretacja kulturowa i artystyczna.</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <div class="section-title">Galeria manuskryptów</div>
+        <div class="gallery">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Codex_Suprasliensis.jpg/250px-Codex_Suprasliensis.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Codex_Suprasliensis.jpg/250px-Codex_Suprasliensis.jpg"
+       alt="Codex Suprasliensis (10th c.)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/8/87/ZographensisColour.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/8/87/ZographensisColour.jpg"
+       alt="Codex Zographensis (10th/11th c.)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/RU_RGB_%D0%A4.87_%E2%84%966_%28Codex_Marianus%29.djvu/page1-800px-RU_RGB_%D0%A4.87_%E2%84%966_%28Codex_Marianus%29.djvu.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/RU_RGB_%D0%A4.87_%E2%84%966_%28Codex_Marianus%29.djvu/page1-800px-RU_RGB_%D0%A4.87_%E2%84%966_%28Codex_Marianus%29.djvu.jpg"
+       alt="Codex Marianus (11th c.)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/f/f9/CodexVaticanusSlavicus3Gagoliticus.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/f/f9/CodexVaticanusSlavicus3Gagoliticus.jpg"
+       alt="Codex Assemanianus (11th c.)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/d/d2/Enina_Apostle_TB.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/d/d2/Enina_Apostle_TB.jpg"
+       alt="Enina Apostle (11th c.)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Ostromir_Gospel_1.jpg/250px-Ostromir_Gospel_1.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Ostromir_Gospel_1.jpg/250px-Ostromir_Gospel_1.jpg"
+       alt="Ostromir Gospel (11th c.)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/2/29/Hilandarski_listi%C4%87i.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/2/29/Hilandarski_listi%C4%87i.jpg"
+       alt="Hilandar fragment (10th/11th c.)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Archangel_Gospel_01.jpg/800px-Archangel_Gospel_01.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Archangel_Gospel_01.jpg/800px-Archangel_Gospel_01.jpg"
+       alt="Arkhangelsk/Archangel Gospel (1092)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/3/38/Hvalov_zbornik1.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/3/38/Hvalov_zbornik1.jpg"
+       alt="Hval's Codex (1404)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Hypatian_Codex.pdf/page9-250px-Hypatian_Codex.pdf.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Hypatian_Codex.pdf/page9-250px-Hypatian_Codex.pdf.jpg"
+       alt="Hypatian Codex (medieval)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/CodexVaticanusSlavicus3Gagoliticus.jpg/500px-CodexVaticanusSlavicus3Gagoliticus.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/CodexVaticanusSlavicus3Gagoliticus.jpg/500px-CodexVaticanusSlavicus3Gagoliticus.jpg"
+       alt="Codex Vaticanus Slavicus (Glagolitic)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Codex_Suprasliensis.jpg/250px-Codex_Suprasliensis.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Codex_Suprasliensis.jpg/250px-Codex_Suprasliensis.jpg"
+       alt="Codex Suprasliensis (leaf)">
+</div>
+
+      </section>
     </div>
 
     <!-- ENGLISH -->
     <div class="lang" id="en">
-      <p><strong>Porter liqueur – tastes f*cking great 🖤👹.</strong></p>
+      <section class="section">
+        <div class="section-title">What is this about?</div>
+        <p>Born from a love of dark beers and Slavic aesthetics — <em>чрьнъ бѣсъ</em> (<strong>czarny bies</strong>) is a porter: dense, roasty and full of character. The name evokes myth and the raw poetics of old words — an invitation to taste history.</p>
+      </section>
 
-      <div class="section-title">What do these words mean?</div>
-      <p>
-        - <span class="highlight">чрьнъ</span> – “black”, old spelling.<br>
-        - <span class="highlight">бѣсъ</span> – “demon / spirit of chaos”.
-      </p>
+      <section class="section">
+        <div class="section-title">What do these words mean?</div>
+        <p><span class="highlight">чрьнъ</span> – old spelling for "black".<br>
+           <span class="highlight">бѣсъ</span> – "bes", a demon/spirit of chaos; also "frenzy" or "madness".</p>
 
-      <div class="section-title">What does the symbol mean?</div>
-      <p>
-        On the label you’ll see the symbol of <strong>Veles</strong> – the Slavic god of cattle, trade, and the underworld.
-        A sign of protection and guidance through chaos – matching the dark soul of a porter 🖤.
-      </p>
+        <div class="etymology-grid">
+          <div class="box">
+            <h3>Transliteration</h3>
+            <p><code>čьrnъ běsъ</code> → today: <strong>czarny bies (black devil)</strong></p>
+          </div>
 
-      <ul>
-        <li>Veles was often depicted as a serpent, bear, or black bull – symbols of raw nature.</li>
-        <li>His sign was worn as an amulet for protection.</li>
-        <li>Keeper of hidden knowledge and chaos.</li>
-      </ul>
+          <div class="box">
+            <h3>Origin</h3>
+            <ul>
+              <li><em>чрьнъ</em> → Proto-Slavic <em>čьrnъ</em> → Polish <em>czarny</em>.</li>
+              <li><em>бѣsъ</em> → Proto-Slavic <em>běsъ</em> → modern <em>bes / бeс</em>; related to <em>běsiti</em> (to rage).</li>
+              <li>Letters like <strong>ѣ</strong> and <strong>ъ/ь</strong> come from Old Church Slavonic script.</li>
+            </ul>
+          </div>
 
-      <p class="small-note">
-        👉 Learn more:
-        <a href="https://en.wikipedia.org/wiki/Veles_(god)" target="_blank">Wikipedia EN</a>,
-        <a href="https://pl.wikipedia.org/wiki/Weles" target="_blank">Wikipedia PL</a>.
-      </p>
+          <div class="box">
+            <h3>Trivia</h3>
+            <ul>
+              <li><em>ѣ</em> often shifted regionally and vanished in most Slavic tongues.</li>
+              <li><em>ъ</em> and <em>ь</em> represented short vowels that later disappeared.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
-      <div class="section-title">Manuscripts Gallery</div>
-      <div class="gallery">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Codex_Suprasliensis.jpg/300px-Codex_Suprasliensis.jpg" alt="Codex Suprasliensis (10th c.)">
-        <img src="https://www.wdl.org/en/item/10091/thumbnail/" alt="Codex Zographensis (10th/11th c.)">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Codex_Marianus.jpg/300px-Codex_Marianus.jpg" alt="Codex Marianus (11th c.)">
-      </div>
+      <section class="section">
+        <div class="section-title">What does this symbol mean?</div>
+        <p>The label shows <strong>Veles</strong> — god of cattle, trade, magic, and the underworld. A sign of protection and strength — fitting for a black porter.</p>
+
+        <ul>
+          <li>Veles was depicted as a serpent, bear or bull — symbols of power and earth.</li>
+          <li>His marks protected homes, herds and wealth.</li>
+          <li>Modern usage is mostly cultural and artistic reinterpretation.</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <div class="section-title">Manuscripts gallery</div>
+        <div class="gallery">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Codex_Suprasliensis.jpg/250px-Codex_Suprasliensis.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Codex_Suprasliensis.jpg/250px-Codex_Suprasliensis.jpg"
+       alt="Codex Suprasliensis (10th c.)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/8/87/ZographensisColour.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/8/87/ZographensisColour.jpg"
+       alt="Codex Zographensis (10th/11th c.)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/RU_RGB_%D0%A4.87_%E2%84%966_%28Codex_Marianus%29.djvu/page1-800px-RU_RGB_%D0%A4.87_%E2%84%966_%28Codex_Marianus%29.djvu.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/RU_RGB_%D0%A4.87_%E2%84%966_%28Codex_Marianus%29.djvu/page1-800px-RU_RGB_%D0%A4.87_%E2%84%966_%28Codex_Marianus%29.djvu.jpg"
+       alt="Codex Marianus (11th c.)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/f/f9/CodexVaticanusSlavicus3Gagoliticus.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/f/f9/CodexVaticanusSlavicus3Gagoliticus.jpg"
+       alt="Codex Assemanianus (11th c.)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/d/d2/Enina_Apostle_TB.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/d/d2/Enina_Apostle_TB.jpg"
+       alt="Enina Apostle (11th c.)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Ostromir_Gospel_1.jpg/250px-Ostromir_Gospel_1.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Ostromir_Gospel_1.jpg/250px-Ostromir_Gospel_1.jpg"
+       alt="Ostromir Gospel (11th c.)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/2/29/Hilandarski_listi%C4%87i.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/2/29/Hilandarski_listi%C4%87i.jpg"
+       alt="Hilandar fragment (10th/11th c.)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Archangel_Gospel_01.jpg/800px-Archangel_Gospel_01.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Archangel_Gospel_01.jpg/800px-Archangel_Gospel_01.jpg"
+       alt="Arkhangelsk/Archangel Gospel (1092)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/3/38/Hvalov_zbornik1.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/3/38/Hvalov_zbornik1.jpg"
+       alt="Hval's Codex (1404)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Hypatian_Codex.pdf/page9-250px-Hypatian_Codex.pdf.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Hypatian_Codex.pdf/page9-250px-Hypatian_Codex.pdf.jpg"
+       alt="Hypatian Codex (medieval)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/CodexVaticanusSlavicus3Gagoliticus.jpg/500px-CodexVaticanusSlavicus3Gagoliticus.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/CodexVaticanusSlavicus3Gagoliticus.jpg/500px-CodexVaticanusSlavicus3Gagoliticus.jpg"
+       alt="Codex Vaticanus Slavicus (Glagolitic)">
+  <img data-full="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Codex_Suprasliensis.jpg/250px-Codex_Suprasliensis.jpg"
+       src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Codex_Suprasliensis.jpg/250px-Codex_Suprasliensis.jpg"
+       alt="Codex Suprasliensis (leaf)">
+</div>
+      </section>
     </div>
 
     <div class="ornament">⸻✦⸻</div>
+
+    <!-- FOOTER -->
+    <footer class="footer-dark">
+      <div class="footer-content">
+        <div class="lang active" id="pl-footer">
+          <a href="index.html" class="back-button">Strona główna</a>
+          <div class="social-icons">
+            <a href="https://github.com/" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="https://linkedin.com/" target="_blank"><i class="fab fa-linkedin"></i></a>
+            <a href="https://instagram.com/" target="_blank"><i class="fab fa-instagram"></i></a>
+          </div>
+          <p class="credit">© 2025 Walery — Wszelkie prawa zastrzeżone</p>
+        </div>
+
+        <div class="lang" id="en-footer">
+          <a href="index.html" class="back-button">Home</a>
+          <p class="credit">© 2025 Walery — All rights reserved</p>
+        </div>
+      </div>
+    </footer>
 
     <!-- Lightbox -->
     <div id="lightbox">
@@ -103,7 +236,6 @@
     </div>
   </div>
 
-  <!-- Skrypt -->
   <script src="{% static 'bies/js/main.js' %}"></script>
 </body>
 </html>
