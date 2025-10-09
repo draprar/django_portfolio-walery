@@ -32,16 +32,10 @@ window.switchLang = function (lang) {
   const lightboxImg = document.getElementById("lightbox-img");
   const caption = document.getElementById("caption");
 
-  if (!galleryImages.length || !lightbox || !lightboxImg) return;
-
-  let currentIndex = 0;
-  let zoom = 1;
-  let isDragging = false;
-  let startX, startY, scrollLeft, scrollTop;
+  if (!galleryImages.length || !lightbox || !lightboxImg || !caption) return;
 
   // --- Otwieranie Lightbox ---
   function openLightbox(index) {
-    currentIndex = index;
     const img = galleryImages[index];
     lightboxImg.src = img.dataset.full || img.src;
     caption.textContent = img.alt || "";
@@ -54,9 +48,6 @@ window.switchLang = function (lang) {
       lightbox.style.transition = "opacity 0.3s ease";
       lightbox.style.opacity = "1";
     }, 10);
-
-    zoom = 1;
-    lightboxImg.style.transform = "scale(1)";
   }
 
   // --- Zamknięcie Lightbox ---
@@ -66,72 +57,23 @@ window.switchLang = function (lang) {
     setTimeout(() => {
       lightbox.classList.remove("active");
       document.body.style.overflow = "";
-      zoom = 1;
-      lightboxImg.style.transform = "scale(1)";
     }, 300);
   }
 
-  // --- Zmiana obrazka (strzałkami lub kliknięciem) ---
-  function showNext(delta) {
-    currentIndex = (currentIndex + delta + galleryImages.length) % galleryImages.length;
-    openLightbox(currentIndex);
-  }
-
-  // Kliknięcie na miniaturę otwiera
+  // --- Otwieranie po kliknięciu miniatury ---
   galleryImages.forEach((img, index) => {
     img.addEventListener("click", () => openLightbox(index));
   });
 
-  // Kliknięcie gdziekolwiek w tło zamyka
-  lightbox.addEventListener("click", (e) => {
-    if (e.target === lightbox) closeLightbox();
-  });
+  // --- Kliknięcie gdziekolwiek zamyka ---
+  lightbox.addEventListener("click", closeLightbox);
+  lightboxImg.addEventListener("click", closeLightbox);
+  caption.addEventListener("click", closeLightbox);
 
-  // Klawisze: Esc, ←, →
+  // --- Zamknięcie klawiszem ESC ---
   document.addEventListener("keydown", (e) => {
-    if (lightbox.classList.contains("active")) {
-      if (e.key === "Escape") closeLightbox();
-      else if (e.key === "ArrowRight") showNext(1);
-      else if (e.key === "ArrowLeft") showNext(-1);
+    if (e.key === "Escape" && lightbox.classList.contains("active")) {
+      closeLightbox();
     }
   });
-
-  // Zoom scroll / double-click
-  lightboxImg.addEventListener("wheel", (e) => {
-    e.preventDefault();
-    zoom += e.deltaY * -0.001;
-    zoom = Math.min(Math.max(1, zoom), 4);
-    lightboxImg.style.transform = `scale(${zoom})`;
-  });
-
-  lightboxImg.addEventListener("dblclick", (e) => {
-    e.stopPropagation();
-    zoom = zoom === 1 ? 2 : 1;
-    lightboxImg.style.transform = `scale(${zoom})`;
-  });
-
-  // Dragowanie przy powiększeniu
-  lightboxImg.addEventListener("mousedown", (e) => {
-    if (zoom <= 1) return;
-    isDragging = true;
-    startX = e.pageX - lightboxImg.offsetLeft;
-    startY = e.pageY - lightboxImg.offsetTop;
-    scrollLeft = lightbox.scrollLeft;
-    scrollTop = lightbox.scrollTop;
-  });
-
-  lightbox.addEventListener("mousemove", (e) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    const x = e.pageX - lightboxImg.offsetLeft;
-    const y = e.pageY - lightboxImg.offsetTop;
-    const walkX = (x - startX) * 1.5;
-    const walkY = (y - startY) * 1.5;
-    lightbox.scrollLeft = scrollLeft - walkX;
-    lightbox.scrollTop = scrollTop - walkY;
-  });
-
-  ["mouseup", "mouseleave"].forEach((ev) =>
-    lightbox.addEventListener(ev, () => (isDragging = false))
-  );
 })();

@@ -114,36 +114,40 @@ a { color: #f5e1a4; text-decoration: underline; }
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
-/* Lightbox */
 #lightbox {
-  display: none;
   position: fixed;
-  z-index: 9999;
-  padding: 40px;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.95);
-  text-align: center;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
 }
-#lightbox img {
+
+#lightbox.active {
+  opacity: 1;
+}
+
+#caption {
+  color: #fff;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 1rem;
+  max-width: 90%;
+  line-height: 1.4;
+}
+
+#lightbox-img {
   max-width: 90%;
   max-height: 80vh;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.8);
+  object-fit: contain;
+  border-radius: 6px;
+  transition: transform 0.3s ease;
 }
-#caption {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #ddd;
-}
-#close {
-  position: absolute;
-  top: 20px; right: 35px;
-  color: #fff; font-size: 36px; font-weight: bold;
-  cursor: pointer; transition: 0.3s;
-}
-#close:hover { color: #f00; }
 
 /* Responsywność */
 @media (max-width: 600px) {
