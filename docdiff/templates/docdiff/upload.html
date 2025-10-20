@@ -1,0 +1,36 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Document Diff Tool | Walery{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h2 class="mb-4 text-center" data-en="📄 Document Diff Tool" data-pl="📄 Narzędzie porównujące dokumenty">
+    📄 Document Diff Tool
+  </h2>
+  <p class="text-muted text-center"
+     data-en="Compare two DOCX, XLSX or TXT files with AI-powered difference detection."
+     data-pl="Porównaj dwa pliki DOCX, XLSX lub TXT z analizą różnic wspieraną przez AI.">
+     Compare two DOCX, XLSX or TXT files with AI-powered difference detection.
+  </p>
+
+  <form method="POST" enctype="multipart/form-data" class="p-4 rounded shadow-sm bg-light">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="file_old" class="form-label"
+             data-en="Old version"
+             data-pl="Stara wersja">Old version</label>
+      <input type="file" name="file_old" id="file_old" accept=".docx,.xlsx,.txt" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label for="file_new" class="form-label"
+             data-en="New version"
+             data-pl="Nowa wersja">New version</label>
+      <input type="file" name="file_new" id="file_new" accept=".docx,.xlsx,.txt" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-dark w-100"
+            data-en="Compare documents"
+            data-pl="Porównaj dokumenty">Compare documents</button>
+  </form>
+</div>
+{% endblock %}

@@ -11,6 +11,7 @@ urlpatterns = [
     path('rugby/', include('rugby.urls')),       # rugby
     path('tonguetwister/', include('tonguetwister.urls')),  # tonguetwister
     path('bies/', include('bies.urls')),        # bies
+    path('docdiff/', include('docdiff.urls')),  # AI Document Diff Tool
 
 
     # API

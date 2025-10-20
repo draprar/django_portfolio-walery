@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     'tonguetwister',
     'rugby',
     'bies',
+    'docdiff',
 
     # External
     'rest_framework',
