@@ -17,7 +17,7 @@ import numpy as np
 
 # Load the Polish language model
 try:
-    nlp = spacy.load("pl_core_news_md")
+    nlp = spacy.load("pl_core_news_sm")
 except OSError:
     raise RuntimeError("spaCy model 'pl_core_news_md' is not installed. Run:\n"
                        "python -m spacy download pl_core_news_md")
