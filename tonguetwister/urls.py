@@ -7,6 +7,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (OldPolishViewSet, ArticulatorViewSet, FunfactViewSet, ExerciseViewSet, TriviaViewSet,
                     TwisterViewSet, CustomTokenObtainPairView, HealthCheckView)
 from rest_framework_simplejwt.views import TokenRefreshView
+from analytics.utils import count_visit
 
 router = DefaultRouter()
 router.register(r'oldpolish', OldPolishViewSet, basename='oldpolish')
@@ -17,7 +18,7 @@ router.register(r'twisters', TwisterViewSet, basename='twisters')
 router.register(r'trivias', TriviaViewSet, basename='trivias')
 
 urlpatterns = [
-    path('', views.main, name='main'),
+    path('', count_visit(views.main), name='main'),
     path('content_management/', views.content_management, name='content_management'),
     path('login/', views.login_view, name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),

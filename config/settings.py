@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     'rugby',
     'bies',
     'docdiff',
+    'analytics',
 
     # External
     'rest_framework',
@@ -277,6 +278,6 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="webmaster@localhost")
 EMAIL_TIMEOUT = 10
 
 # Logins
-LOGIN_URL = "/admin/login/"
+LOGIN_URL = "/admin69/login/"
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "main"

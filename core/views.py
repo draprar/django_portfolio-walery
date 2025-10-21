@@ -4,11 +4,16 @@ from django.conf import settings
 from django.shortcuts import render
 import logging
 
+from analytics.utils import count_visit
 from .forms import ContactForm
 from .models import Project
-from .email import send_brevo_email   # <- zamiast send_mail
+from .email import send_brevo_email
 
 logger = logging.getLogger(__name__)
+
+@count_visit
+def index(request):
+    return render(request, "core/index.html")
 
 def health_check(request):
     return JsonResponse({"status": "ok"})

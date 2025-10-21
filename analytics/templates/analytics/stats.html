@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Visit Stats</title>
+  <style>
+    body { font-family: sans-serif; background: #111; color: #eee; padding: 2rem; }
+    table { border-collapse: collapse; width: 50%; }
+    th, td { border-bottom: 1px solid #333; padding: 0.5rem 1rem; text-align: left; }
+    tr:hover { background: #222; }
+  </style>
+</head>
+<body>
+  <h1>Page Visits</h1>
+  <table>
+    <tr><th>Path</th><th>Count</th><th>Last visit</th></tr>
+    {% for v in visits %}
+      <tr>
+        <td>{{ v.path }}</td>
+        <td>{{ v.count }}</td>
+        <td>{{ v.last_visit }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</body>
+</html>
