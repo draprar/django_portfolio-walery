@@ -66,7 +66,7 @@ class AdminOnlyMixin(UserPassesTestMixin):
         Redirects unauthorized users to the home page with an error message.
         """
         messages.error(self.request, "You do not have permission to perform this action.")
-        return redirect('gallery:home')
+        return redirect('gallery:gallery_home')
 
 
 class UploadImage(AdminOnlyMixin, generic.CreateView):
@@ -76,7 +76,7 @@ class UploadImage(AdminOnlyMixin, generic.CreateView):
     model = Gallery
     template_name = 'gallery/upload-image.html'
     form_class = GalleryForm
-    success_url = reverse_lazy('gallery:home')
+    success_url = reverse_lazy('gallery:gallery_home')
 
     def form_valid(self, form):
         """
@@ -99,7 +99,7 @@ class DeleteImage(AdminOnlyMixin, generic.DeleteView):
     """
     model = Gallery
     template_name = 'gallery/delete-image.html'
-    success_url = reverse_lazy('gallery:home')
+    success_url = reverse_lazy('gallery:gallery_home')
 
     def get_object(self, queryset=None):
         """
@@ -115,7 +115,7 @@ class CreateCategory(AdminOnlyMixin, generic.CreateView):
     model = Category
     template_name = 'gallery/create-category.html'
     form_class = CategoryForm
-    success_url = reverse_lazy('upload-image')
+    success_url = reverse_lazy('gallery:upload-image')
 
 
 class ContactView(View):
@@ -156,7 +156,7 @@ class ContactView(View):
             except Exception as e:
                 logger.error(f"Error sending email: {e}")
                 messages.error(request, "An error occurred while sending the email. Please try again later.")
-            return redirect('gallery:contact')
+            return redirect('home')
         return render(request, self.template_name, {'form': form})
 
 

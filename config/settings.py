@@ -1,4 +1,5 @@
 from pathlib import Path
+import sys
 import environ
 import dj_database_url
 from datetime import timedelta
@@ -133,6 +134,14 @@ else:
     # Local/dev fallback
     DATABASES = {
         "default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}
+    }
+# --- Force SQLite for pytest or Django test runner ---
+if any(arg in sys.argv for arg in ["test", "pytest"]):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "test_db.sqlite3",
+        }
     }
 
 # REST API configuration

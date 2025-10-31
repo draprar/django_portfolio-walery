@@ -21,6 +21,6 @@ def send_brevo_email(subject, html_content, recipient_list):
     try:
         response = api_instance.send_transac_email(send_smtp_email)
         return response
-    except ApiException as e:
+    except (ApiException, Exception) as e:
         print("Błąd podczas wysyłania maila z Brevo: %s\n" % e)
         return None

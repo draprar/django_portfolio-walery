@@ -42,17 +42,17 @@
                 <!-- "All" Category -->
                 <li class="nav-item">
                     <a class="nav-link
-                        {% if request.resolver_match.url_name == 'gallery_home' %}
+                        {% if request.resolver_match.url_name == 'gallery:gallery_home' %}
                             {% if not selected_category or selected_category == 'All' %}active{% endif %}
                         {% endif %}"
-                        href="{% url 'gallery_home' %}">All</a>
+                        href="{% url 'gallery:gallery_home' %}">All</a>
                 </li>
 
                 <!-- Dynamic Categories -->
                 {% for category in categories %}
                 <li class="nav-item">
                     <a class="nav-link {% if selected_category == category.title %}active{% endif %}"
-                        href="{% url 'gallery_home' %}?category={{ category.title }}">
+                        href="{% url 'gallery:gallery_home' %}?category={{ category.title }}">
                         {{ category.title }}
                     </a>
                 </li>

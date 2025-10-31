@@ -7,7 +7,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, Sp
 urlpatterns = [
     path('admin69/', admin.site.urls),
     path('', include('core.urls')),             # portfolio landing page
-    path('gallery/', include('gallery.urls')),  # gallery
+    path('gallery/', include(('gallery.urls', 'gallery'), namespace='gallery')),  # gallery
     path('rugby/', include('rugby.urls')),       # rugby
     path('tonguetwister/', include('tonguetwister.urls')),  # tonguetwister
     path('bies/', include('bies.urls')),        # bies
