@@ -46,33 +46,9 @@ jobs:
 
       - name: Set up environment variables
         run: |
-          echo "DJANGO_DEBUG=True" >> .env
-          echo "DJANGO_SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+          echo "DEBUG=True" >> .env
+          echo "SECRET_KEY=test-secret" >> .env
           echo "DATABASE_URL=postgres://postgres:postgres@localhost:5432/test_db" >> .env
-
-          echo "SENTRY_DSN=" >> .env
-          echo "REDIS_URL=" >> .env
-          echo "CORS_ALLOWED_ORIGINS=http://localhost,http://127.0.0.1" >> .env
-          echo "DJANGO_ALLOWED_HOSTS=127.0.0.1,localhost" >> .env
-          echo "DJANGO_CSRF_TRUSTED_ORIGINS=http://localhost,http://127.0.0.1" >> .env
-
-          # Supabase / AWS dummy values for CI
-          echo "AWS_ACCESS_KEY_ID=dummy" >> .env
-          echo "AWS_SECRET_ACCESS_KEY=dummy" >> .env
-          echo "AWS_STORAGE_BUCKET_NAME=dummy" >> .env
-          echo "AWS_S3_REGION_NAME=eu-central-1" >> .env
-          echo "SUPABASE_PROJECT_REF=dummyref" >> .env
-
-          # Email (can be empty for CI)
-          echo "BREVO_API_KEY=" >> .env
-          echo "EMAIL_HOST=" >> .env
-          echo "EMAIL_PORT=587" >> .env
-          echo "EMAIL_USE_TLS=True" >> .env
-          echo "EMAIL_HOST_USER=" >> .env
-          echo "EMAIL_HOST_PASSWORD=" >> .env
-          echo "DEFAULT_FROM_EMAIL=test@example.com" >> .env
-        env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
       - name: Wait for Postgres
         run: |
