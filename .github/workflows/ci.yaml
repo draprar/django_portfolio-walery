@@ -47,7 +47,8 @@ jobs:
       - name: Set up environment variables
         run: |
           echo "DJANGO_DEBUG=True" >> .env
-          echo "DJANGO_SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+          echo "DJANGO_SECRET_KEY=test-secret-for-ci" >> .env
+          echo "SECRET_KEY=test-secret-for-ci" >> .env
           echo "DATABASE_URL=postgres://postgres:postgres@localhost:5432/test_db" >> .env
 
           echo "SENTRY_DSN=" >> .env
