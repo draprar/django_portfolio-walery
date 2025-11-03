@@ -49,7 +49,7 @@ jobs:
           echo "DJANGO_DEBUG=True" >> .env
           echo "DJANGO_SECRET_KEY=test-secret-for-ci" >> .env
           echo "SECRET_KEY=test-secret-for-ci" >> .env
-          echo "DATABASE_URL=postgres://postgres:postgres@localhost:5432/test_db" >> .env
+          echo "DATABASE_URL=postgres://postgres:postgres@localhost:5432/test_db?sslmode=disable" >> .env
 
           echo "SENTRY_DSN=" >> .env
           echo "REDIS_URL=" >> .env
