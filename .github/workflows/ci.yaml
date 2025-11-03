@@ -57,6 +57,8 @@ jobs:
           echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> .env
           echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> .env
           echo "DATABASE_URL=postgres://postgres:postgres@localhost:5432/test_db" >> .env
+          echo "AWS_ACCESS_KEY_ID=" >> .env
+          echo "AWS_SECRET_ACCESS_KEY=" >> .env
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
@@ -69,7 +71,6 @@ jobs:
 
       - name: Run migrations
         run: |
-          python manage.py makemigrations
           python manage.py migrate
 
       - name: Collect static files
