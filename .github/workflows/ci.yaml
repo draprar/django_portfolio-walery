@@ -100,9 +100,12 @@ jobs:
           print("Using DATABASES:", settings.DATABASES.get("default"))
           PY
 
-      - name: Run migrations (create correct SQLite schema)
+      - name: Prepare database and migrations
         run: |
-          python manage.py migrate --noinput
+         find . -path "*/migrations/*.pyc" -delete
+         find . -path "*/__pycache__" -delete
+         python manage.py makemigrations --noinput
+         python manage.py migrate --noinput
 
       - name: Collect static files
         run: python manage.py collectstatic --noinput
