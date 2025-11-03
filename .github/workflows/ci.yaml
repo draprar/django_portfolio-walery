@@ -44,12 +44,12 @@ jobs:
       - name: Show installed packages
         run: pip list
 
-      - name: Set up environment variables
+      - name: Set up environment variables (no DATABASE_URL)
         run: |
           echo "DJANGO_DEBUG=True" >> .env
           echo "DJANGO_SECRET_KEY=test-secret-for-ci" >> .env
           echo "SECRET_KEY=test-secret-for-ci" >> .env
-          # NOTE: DATABASE_URL intentionally NOT set so settings.py falls back to SQLite for tests.
+          # DATABASE_URL intentionally NOT set so tests use SQLite from settings.py
 
           echo "SENTRY_DSN=" >> .env
           echo "REDIS_URL=" >> .env
@@ -73,15 +73,44 @@ jobs:
           echo "EMAIL_HOST_PASSWORD=" >> .env
           echo "DEFAULT_FROM_EMAIL=test@example.com" >> .env
 
-      # Optional quick check: show .env contents (safe because no secrets here)
       - name: Show .env (debug)
         run: |
           echo "---- .env ----"
           cat .env || true
           echo "---------------"
 
+      - name: Clean pyc, __pycache__ and sqlite files
+        run: |
+          find . -type d -name "__pycache__" -exec rm -rf {} + || true
+          find . -name "*.pyc" -delete || true
+          rm -f db.sqlite3 test_db.sqlite3 || true
+          # remove any other *.sqlite3 leftover
+          find . -name "*.sqlite3" -exec rm -f {} + || true
+
+      - name: Show DB backend detection (Django debug)
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings
+        run: |
+          python - <<'PY'
+          import os, sys
+          os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+          import django
+          django.setup()
+          from django.conf import settings
+          print("Using DATABASES:", settings.DATABASES.get("default"))
+          PY
+
+      - name: Run migrations (create correct SQLite schema)
+        run: |
+          python manage.py migrate --noinput
+
       - name: Collect static files
         run: python manage.py collectstatic --noinput
+
+      - name: Clean caches again just in case
+        run: |
+          find . -type d -name "__pycache__" -exec rm -rf {} + || true
+          find . -name "*.pyc" -delete || true
 
       - name: Run tests with pytest
         run: |
