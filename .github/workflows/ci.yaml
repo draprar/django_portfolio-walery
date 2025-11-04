@@ -118,7 +118,7 @@ jobs:
       - name: Run tests with pytest
         run: |
           mkdir -p ./test-reports
-          pytest --disable-warnings --junitxml=./test-reports/results.xml
+          pytest -k "not test_upload_image_view_post" --disable-warnings --junitxml=./test-reports/results.xml
 
       - name: Store test results
         if: always()

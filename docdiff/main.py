@@ -4,13 +4,13 @@ import logging
 import sys
 from enum import IntEnum
 
-from diff_engine import compare_blocks
-from report_builder import generate_html_report, generate_json_report
+from docdiff.diff_engine import compare_blocks
+from docdiff.report_builder import generate_html_report, generate_json_report
 
 # extractors
-from extractors.extract_docx import DocxExtractor
-from extractors.extract_txt import TxtExtractor
-from extractors.extract_xlsx import XlsxExtractor
+from docdiff.extractors.extract_docx import DocxExtractor
+from docdiff.extractors.extract_txt import TxtExtractor
+from docdiff.extractors.extract_xlsx import XlsxExtractor
 
 _LOGGER = logging.getLogger(__name__)
 
