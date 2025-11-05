@@ -11,11 +11,10 @@ class Visit(models.Model):
 
 class VisitLog(models.Model):
     visit = models.ForeignKey(Visit, on_delete=models.CASCADE, related_name="logs")
-    ip = models.GenericIPAddressField()
     timestamp = models.DateTimeField(auto_now_add=True)
     duration = models.FloatField(default=0)  # sec
     ref_type = models.CharField(max_length=50, default='direct')
 
     def __str__(self):
-        return f"{self.ip} @ {self.visit.path} ({self.timestamp:%Y-%m-%d %H:%M:%S})"
+        return f"{self.visit.path} ({self.timestamp:%Y-%m-%d %H:%M:%S})"
 

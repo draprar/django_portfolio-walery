@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Daily Visits</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: sans-serif; background: #111; color: #eee; padding: 2rem; }
+    h1 { margin-bottom: 1.5rem; }
+    canvas { background: #222; padding: 1rem; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Daily Visits</h1>
+  <canvas id="chart" width="600" height="300"></canvas>
+
+  <script>
+    const ctx = document.getElementById('chart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: {{ labels|safe }},
+        datasets: [{
+          label: 'Visits per day',
+          data: {{ data|safe }},
+          borderColor: '#4fc3f7',
+          backgroundColor: 'rgba(79,195,247,0.2)',
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        plugins: { legend: { display: true, labels: { color: '#eee' } } },
+        scales: {
+          x: { ticks: { color: '#aaa' }, grid: { color: '#333' } },
+          y: { ticks: { color: '#aaa' }, grid: { color: '#333' }, beginAtZero: true }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 def validate_file_size(file):
-    max_mb = 5  # maksymalny rozmiar w MB — zmień jeśli chcesz
+    max_mb = 5
     if file.size > max_mb * 1024 * 1024:
         raise ValidationError(_(f"Max file size is {max_mb} MB"))
 
