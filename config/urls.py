@@ -3,9 +3,12 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
+import environ
+
+env = environ.Env()
 
 urlpatterns = [
-    path('admin69/', admin.site.urls),
+    path(f'{env("DJANGO_ADMIN_URL")}/', admin.site.urls),
     path('', include('core.urls')),             # portfolio landing page
     path('gallery/', include(('gallery.urls', 'gallery'), namespace='gallery')),  # gallery
     path('rugby/', include('rugby.urls')),       # rugby

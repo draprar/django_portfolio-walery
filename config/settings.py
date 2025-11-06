@@ -51,6 +51,8 @@ if not DEBUG:
     # Secure Cookies
     SESSION_COOKIE_SECURE = True  # Ensures cookies are only sent over HTTPS
     CSRF_COOKIE_SECURE = True  # Ensures CSRF cookie is only sent over HTTPS
+    SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+    SESSION_COOKIE_AGE = 60 * 60 * 2  # 2h max session lifetime
 
     # X-Frame-Options to prevent clickjacking
     X_FRAME_OPTIONS = 'DENY'
@@ -287,27 +289,32 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="webmaster@localhost")
 EMAIL_TIMEOUT = 10
 
 # Logins
-LOGIN_URL = "/admin69/login/"
+LOGIN_URL = f"/{env('DJANGO_ADMIN_URL')}/login/"
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "main"
 
-# 1) Enforce SameSite on cookies to reduce CSRF risk
+# Enforce SameSite on cookies to reduce CSRF risk
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
 
-#  Start in report-only mode. After monitoring set SECURE_CSP_REPORT_ONLY = False to enforce.
+# Start in report-only mode. After monitoring set SECURE_CSP_REPORT_ONLY = False to enforce.
 SECURE_CSP_REPORT_ONLY = True
 SECURE_CSP = {
-    # directive: policy (use strings, include quotes where needed)
+    # Main default
     "default-src": "'self'",
+    # Allow all images from HTTPS and inline data (for icons, etc.)
     "img-src": "'self' data: https:",
-    "script-src": "'self'",
-    "style-src": "'self' https://fonts.googleapis.com",
-    "font-src": "'self' https://fonts.gstatic.com",
+    # Allow JS from self and trusted CDNs
+    "script-src": "'self' https://cdn.jsdelivr.net https://unpkg.com",
+    # Allow CSS from self and trusted CDNs (Bootstrap, FontAwesome, AOS, Google Fonts)
+    "style-src": "'self' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com",
+    # Allow fonts from trusted CDNs
+    "font-src": "'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
+    # Disallow embedding site in iframes
     "frame-ancestors": "'none'",
 }
 
-# Define a simple middleware factory here so it is importable as 'config.settings.csp_headers'
+# Define a simple middleware factory so it is importable as 'config.settings.csp_headers'
 def csp_headers(get_response):
     """
     Simple middleware that injects a CSP header.
@@ -322,7 +329,7 @@ def csp_headers(get_response):
         return response
     return middleware
 
-# Insert our CSP middleware right after SecurityMiddleware if that middleware exists.
+# Insert CSP middleware right after SecurityMiddleware if that middleware exists.
 try:
     idx = MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1
     MIDDLEWARE.insert(idx, "config.settings.csp_headers")
@@ -330,8 +337,27 @@ except ValueError:
     # If SecurityMiddleware not found for some reason, append at the front to still apply it.
     MIDDLEWARE.insert(0, "config.settings.csp_headers")
 
-# 3) Proxy / SSL helper and admin redirect exemptions
-#    Useful when running behind Render / other proxies and to avoid redirect loops.
+# Proxy / SSL helper and admin redirect exemptions
+# Useful when running behind Render / other proxies and to avoid redirect loops.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # Avoid redirect loop for admin login if you handle it differently at proxy level
 SECURE_REDIRECT_EXEMPT = [r"^admin69/login/$"]
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "file": {
+            "level": "WARNING",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "django_warnings.log",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["file"],
+            "level": "WARNING",
+            "propagate": True,
+        },
+    },
+}
