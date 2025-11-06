@@ -290,3 +290,48 @@ EMAIL_TIMEOUT = 10
 LOGIN_URL = "/admin69/login/"
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "main"
+
+# 1) Enforce SameSite on cookies to reduce CSRF risk
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = "Lax"
+
+#  Start in report-only mode. After monitoring set SECURE_CSP_REPORT_ONLY = False to enforce.
+SECURE_CSP_REPORT_ONLY = True
+SECURE_CSP = {
+    # directive: policy (use strings, include quotes where needed)
+    "default-src": "'self'",
+    "img-src": "'self' data: https:",
+    "script-src": "'self'",
+    "style-src": "'self' https://fonts.googleapis.com",
+    "font-src": "'self' https://fonts.gstatic.com",
+    "frame-ancestors": "'none'",
+}
+
+# Define a simple middleware factory here so it is importable as 'config.settings.csp_headers'
+def csp_headers(get_response):
+    """
+    Simple middleware that injects a CSP header.
+    It uses REPORT-ONLY mode while SECURE_CSP_REPORT_ONLY is True.
+    """
+    def middleware(request):
+        response = get_response(request)
+        # Build policy string like: "default-src 'self'; img-src 'self' data: https:; ..."
+        csp_policy = "; ".join(f"{k} {v}" for k, v in SECURE_CSP.items())
+        header_name = "Content-Security-Policy-Report-Only" if SECURE_CSP_REPORT_ONLY else "Content-Security-Policy"
+        response[header_name] = csp_policy
+        return response
+    return middleware
+
+# Insert our CSP middleware right after SecurityMiddleware if that middleware exists.
+try:
+    idx = MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1
+    MIDDLEWARE.insert(idx, "config.settings.csp_headers")
+except ValueError:
+    # If SecurityMiddleware not found for some reason, append at the front to still apply it.
+    MIDDLEWARE.insert(0, "config.settings.csp_headers")
+
+# 3) Proxy / SSL helper and admin redirect exemptions
+#    Useful when running behind Render / other proxies and to avoid redirect loops.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# Avoid redirect loop for admin login if you handle it differently at proxy level
+SECURE_REDIRECT_EXEMPT = [r"^admin69/login/$"]
