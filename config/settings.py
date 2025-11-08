@@ -81,7 +81,7 @@ INSTALLED_APPS = [
     'analytics',
 
     # External
-    'django_ratelimit'
+    'django_ratelimit',
     'rest_framework',
     'corsheaders',
     'drf_spectacular',
