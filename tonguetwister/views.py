@@ -14,6 +14,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.contrib.auth.decorators import user_passes_test, login_required
+from django.views.decorators.http import require_http_methods
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
@@ -542,6 +543,7 @@ def user_content(request):
 # Add/delete Articulators
 @login_required
 @csrf_protect
+@require_http_methods(["POST"])
 def add_articulator(request, articulator_id):
     user = request.user
     articulator = get_object_or_404(Articulator, id=articulator_id)
@@ -553,6 +555,7 @@ def add_articulator(request, articulator_id):
 
 @login_required
 @csrf_protect
+@require_http_methods(["POST"])
 def delete_articulator(request, articulator_id):
     user = request.user
     articulator = get_object_or_404(UserProfileArticulator, id=articulator_id, user=user)
@@ -563,6 +566,7 @@ def delete_articulator(request, articulator_id):
 # Add/delete Exercises
 @login_required
 @csrf_protect
+@require_http_methods(["POST"])
 def add_exercise(request, exercise_id):
     user = request.user
     exercise = get_object_or_404(Exercise, id=exercise_id)
@@ -574,6 +578,7 @@ def add_exercise(request, exercise_id):
 
 @login_required
 @csrf_protect
+@require_http_methods(["POST"])
 def delete_exercise(request, exercise_id):
     exercise = get_object_or_404(UserProfileExercise, id=exercise_id, user=request.user)
     exercise.delete()
@@ -583,6 +588,7 @@ def delete_exercise(request, exercise_id):
 # Add/delete Twisters
 @login_required
 @csrf_protect
+@require_http_methods(["POST"])
 def add_twister(request, twister_id):
     user = request.user
     twister = get_object_or_404(Twister, id=twister_id)
@@ -594,6 +600,7 @@ def add_twister(request, twister_id):
 
 @login_required
 @csrf_protect
+@require_http_methods(["POST"])
 def delete_twister(request, twister_id):
     twister = get_object_or_404(UserProfileTwister, id=twister_id, user=request.user)
     twister.delete()

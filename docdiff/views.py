@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
+from django.views.decorators.http import require_http_methods
 from pathlib import Path
 import tempfile
-import json
+import shutil
 
 from .extractors.extract_docx import DocxExtractor
 from .extractors.extract_xlsx import XlsxExtractor
@@ -12,19 +13,48 @@ from .report_builder import generate_html_report
 from .heuristics_ai import analyze_change
 
 
+# Upload validation parameters
+MAX_FILE_SIZE_MB = 10
+ALLOWED_EXTENSIONS = {".docx", ".xlsx", ".txt"}
+ALLOWED_MIME = {
+    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ".txt": "text/plain",
+}
+
+def validate_upload(upload):
+    """Validate uploaded file extension, MIME and size."""
+    ext = Path(upload.name).suffix.lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        raise ValueError(f"Unsupported file type: {ext}")
+    if upload.size > MAX_FILE_SIZE_MB * 1024 * 1024:
+        raise ValueError(f"File too large: {upload.size / 1024**2:.1f} MB")
+    if hasattr(upload, "content_type"):
+        if upload.content_type != ALLOWED_MIME.get(ext, ""):
+            raise ValueError(f"Invalid MIME type: {upload.content_type}")
+
+
+@require_http_methods(["GET", "POST"])
 def docdiff_view(request):
     """
-    Główny widok narzędzia DocDiff.
-    Obsługuje upload dwóch plików, porównanie i wyświetlenie raportu.
+    Main DocDiff view:
+    Handles upload of two files, performs diff and returns rendered HTML report.
     """
     if request.method == "POST":
         file_old = request.FILES.get("file_old")
         file_new = request.FILES.get("file_new")
 
         if not file_old or not file_new:
-            return JsonResponse({"error": "Proszę przesłać dwa pliki do porównania."}, status=400)
+            return JsonResponse({"error": "Please upload both files."}, status=400)
 
-        # Zapis tymczasowy
+        # Validate uploads
+        try:
+            validate_upload(file_old)
+            validate_upload(file_new)
+        except ValueError as e:
+            return JsonResponse({"error": str(e)}, status=400)
+
+        # Temporary storage
         temp_dir = Path(tempfile.mkdtemp())
         old_path = temp_dir / file_old.name
         new_path = temp_dir / file_new.name
@@ -36,7 +66,7 @@ def docdiff_view(request):
             for chunk in file_new.chunks():
                 f.write(chunk)
 
-        # Wybór ekstraktora po rozszerzeniu
+        # Select extractor by extension
         def get_extractor(path: Path):
             ext = path.suffix.lower()
             if ext == ".docx":
@@ -45,31 +75,37 @@ def docdiff_view(request):
                 return XlsxExtractor()
             elif ext == ".txt":
                 return TxtExtractor()
-            else:
-                raise ValueError(f"Nieobsługiwane rozszerzenie: {ext}")
+            raise ValueError(f"Unsupported extension: {ext}")
 
         old_extractor = get_extractor(old_path)
         new_extractor = get_extractor(new_path)
 
-        # Ekstrakcja i porównanie bloków
+        # Extraction and comparison
         old_blocks = old_extractor.extract_blocks(old_path)
         new_blocks = new_extractor.extract_blocks(new_path)
         diff_result = compare_blocks(old_blocks, new_blocks)
 
-        # AI analiza semantyczna
+        # Prevent excessive AI processing
+        if len(diff_result) > 1000:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+            return JsonResponse({"error": "File too large for AI analysis."}, status=400)
+
+        # AI semantic analysis
         for block in diff_result:
             ai_info = analyze_change(block)
             block.update(ai_info)
 
-        # Generowanie raportu HTML
-        output_html = temp_dir / "raport.html"
+        # Generate report
+        output_html = temp_dir / "report.html"
         generate_html_report(diff_result, output_html)
 
-        # Wczytanie gotowego raportu i render w przeglądarce
         with open(output_html, "r", encoding="utf-8") as f:
             html_content = f.read()
 
+        # Clean up temp directory
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
         return HttpResponse(html_content)
 
-    # GET → pokazuje formularz uploadu
+    # GET → upload form
     return render(request, "docdiff/upload.html")
