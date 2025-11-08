@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     'analytics',
 
     # External
+    'ratelimit'
     'rest_framework',
     'corsheaders',
     'drf_spectacular',
@@ -297,8 +298,8 @@ LOGOUT_REDIRECT_URL = "main"
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
 
-# Start in report-only mode. After monitoring set SECURE_CSP_REPORT_ONLY = False to enforce.
-SECURE_CSP_REPORT_ONLY = True
+# Start in report-only mode
+SECURE_CSP_REPORT_ONLY = False
 SECURE_CSP = {
     # Main default
     "default-src": "'self'",

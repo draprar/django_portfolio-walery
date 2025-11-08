@@ -327,6 +327,7 @@
 
   <form method="post" action="{% url 'contact' %}" class="row g-3 mt-3" id="contact-form">
     {% csrf_token %}
+    <input type="text" name="website" style="display:none" autocomplete="off">
     <div class="col-md-6">{{ form.name }}</div>
     <div class="col-md-6">{{ form.email }}</div>
     <div class="col-12">{{ form.message }}</div>

@@ -1,8 +1,12 @@
-from django.views import View
-from django.http import JsonResponse
-from django.conf import settings
-from django.shortcuts import render
 import logging
+
+from django.conf import settings
+from django.http import JsonResponse, HttpResponseNotAllowed
+from django.shortcuts import render
+from django.views import View
+from django.utils.decorators import method_decorator
+
+from django_ratelimit.decorators import ratelimit
 
 from analytics.utils import count_visit
 from .forms import ContactForm
@@ -11,74 +15,106 @@ from .email import send_brevo_email
 
 logger = logging.getLogger(__name__)
 
+
 @count_visit
 def index(request):
     return render(request, "core/index.html")
 
+
 def health_check(request):
     return JsonResponse({"status": "ok"})
 
+
 class HomeView(View):
-    template_name = 'core/index.html'
+    template_name = "core/index.html"
 
     def get(self, request):
         form = ContactForm()
         projects = Project.objects.all()
-        return render(request, self.template_name, {
-            'form': form,
-            'projects': projects
-        })
+        return render(request, self.template_name, {"form": form, "projects": projects})
 
 
+@method_decorator(ratelimit(key="ip", rate="5/m", block=True), name="dispatch")
 class ContactView(View):
-    def post(self, request, *args, **kwargs):
-        logger.debug("ContactView called")
-        logger.debug("Headers: %s", dict(request.headers))
-        logger.debug("POST data: %s", request.POST)
+    """
+    Secure contact endpoint:
+    - rate-limited (5 requests/min per IP) via django-ratelimit
+    - rejects non-AJAX requests (X-Requested-With)
+    - simple honeypot check for hidden 'website' field
+    - does not log PII or message body
+    """
 
-        if request.headers.get("x-requested-with") != "XMLHttpRequest":
-            logger.warning("Invalid request: missing XHR header")
+    def post(self, request, *args, **kwargs):
+        # Basic XHR check (case-insensitive)
+        if request.headers.get("x-requested-with", "").lower() != "xmlhttprequest":
+            logger.warning("Contact attempt rejected: missing or invalid XHR header from %s",
+                           request.META.get("REMOTE_ADDR"))
             return JsonResponse({"success": False, "message": "Invalid request."}, status=400)
 
+        # Honeypot: invisible field that bots often fill
+        if request.POST.get("website"):
+            logger.warning("Honeypot triggered from %s", request.META.get("REMOTE_ADDR"))
+            # return a generic success-looking response to reduce bot feedback
+            return JsonResponse({"success": False, "message": "Invalid form data."}, status=400)
+
         form = ContactForm(request.POST)
-        if form.is_valid():
-            try:
-                form.save()
 
-                subject = "New Portfolio Contact"
-                html_content = f"""
-                    <h2>Message from {form.cleaned_data['name']}</h2>
-                    <p><strong>Email:</strong> {form.cleaned_data['email']}</p>
-                    <p>{form.cleaned_data['message']}</p>
-                """
-                recipient_list = [settings.DEFAULT_FROM_EMAIL]  # możesz zmienić na swój adres
+        # Log only IP and validation result. Do NOT log form data or message content.
+        logger.debug("Contact form submitted from %s. Valid: %s",
+                     request.META.get("REMOTE_ADDR"), form.is_valid())
 
-                result = send_brevo_email(subject, html_content, recipient_list)
+        if not form.is_valid():
+            errors = {field: list(errs) for field, errs in form.errors.items()}
+            logger.warning("Invalid contact form from %s. Errors: %s",
+                           request.META.get("REMOTE_ADDR"), errors)
+            return JsonResponse({
+                "success": False,
+                "message": "Invalid form data.",
+                "errors": errors
+            }, status=400)
 
-                if result:
-                    logger.info("Contact form saved and Brevo email sent")
-                    return JsonResponse({
-                        "success": True,
-                        "message": "Your message has been sent successfully!"
-                    })
-                else:
-                    logger.error("Brevo email sending failed")
-                    return JsonResponse({
-                        "success": False,
-                        "message": "Email service failed, please try again later."
-                    }, status=500)
+        # At this point form is valid. Save and send email.
+        try:
+            # Persist (but avoid logging saved content)
+            form.save()
 
-            except Exception as e:
-                logger.exception("Error sending email")
+            subject = "New Portfolio Contact"
+            # Build email body from cleaned_data. We must include the message in the mail,
+            # but do not log the content anywhere.
+            name = form.cleaned_data.get("name", "Unknown")
+            email = form.cleaned_data.get("email", "")
+            message_body = form.cleaned_data.get("message", "")
+
+            html_content = f"""
+                <h2>Message from {name}</h2>
+                <p><strong>Email:</strong> {email}</p>
+                <div>{message_body}</div>
+            """
+
+            recipient_list = [settings.DEFAULT_FROM_EMAIL]
+
+            result = send_brevo_email(subject, html_content, recipient_list)
+
+            if result:
+                logger.info("Contact form processed successfully from %s", request.META.get("REMOTE_ADDR"))
+                return JsonResponse({
+                    "success": True,
+                    "message": "Your message has been sent successfully!"
+                })
+            else:
+                logger.error("Email sending failed for contact from %s", request.META.get("REMOTE_ADDR"))
                 return JsonResponse({
                     "success": False,
-                    "message": "An error occurred while sending the email. Please try again later."
+                    "message": "Email service failed, please try again later."
                 }, status=500)
 
-        errors = {field: list(errs) for field, errs in form.errors.items()}
-        logger.warning("Form validation failed: %s", errors)
-        return JsonResponse({
-            "success": False,
-            "message": "Invalid form data.",
-            "errors": errors
-        }, status=400)
+        except Exception:
+            # logger.exception records traceback but avoid attaching user content
+            logger.exception("Unhandled error processing contact form from %s", request.META.get("REMOTE_ADDR"))
+            return JsonResponse({
+                "success": False,
+                "message": "An error occurred while sending the email. Please try again later."
+            }, status=500)
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponseNotAllowed(permitted_methods=["POST"])
