@@ -8,7 +8,7 @@ import environ
 env = environ.Env()
 
 urlpatterns = [
-    path(f'{env("DJANGO_ADMIN_URL")}/', admin.site.urls),
+    path(f"{env('DJANGO_ADMIN_URL', default='admin')}/", admin.site.urls),
     path('', include('core.urls')),             # portfolio landing page
     path('gallery/', include(('gallery.urls', 'gallery'), namespace='gallery')),  # gallery
     path('rugby/', include('rugby.urls')),       # rugby
