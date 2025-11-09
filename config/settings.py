@@ -290,7 +290,7 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="webmaster@localhost")
 EMAIL_TIMEOUT = 10
 
 # Logins
-LOGIN_URL = f"/{env('DJANGO_ADMIN_URL')}/login/"
+LOGIN_URL = f"/{env('DJANGO_ADMIN_URL', default='admin')}/login/"
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "main"
 
