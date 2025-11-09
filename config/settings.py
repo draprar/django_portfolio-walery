@@ -41,13 +41,6 @@ ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["127.0.0.1", "localhos
 CSRF_TRUSTED_ORIGINS = env.list("DJANGO_CSRF_TRUSTED_ORIGINS", default=["http://localhost", "http://127.0.0.1"])
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["http://localhost", "http://127.0.0.1"])
 
-if os.getenv("CI", "false") == "true":
-    CACHES = {
-        "default": {
-            "BACKEND": "django.core.cache.backends.dummy.DummyCache"
-        }
-    }
-
 # Security & Session settings
 if not DEBUG:
     # Enforce HTTPS and related security features
@@ -202,9 +195,14 @@ if REDIS_URL:
         }
     }
 else:
-    # Local fallback (dev)
-    CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
-
+    if os.getenv("CI", "false") == "true":
+        CACHES = {
+            "default": {
+                "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+            }
+        }
+    else:
+        CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
 
 SENTRY_DSN = env("SENTRY_DSN", default=None)
 if SENTRY_DSN:
