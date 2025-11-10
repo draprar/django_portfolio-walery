@@ -195,14 +195,12 @@ if REDIS_URL:
         }
     }
 else:
-    if os.getenv("CI", "false") == "true":
-        CACHES = {
-            "default": {
-                "BACKEND": "django.core.cache.backends.dummy.DummyCache",
-            }
+    # Use LocMemCache for dev and CI.
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         }
-    else:
-        CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
+    }
 
 SENTRY_DSN = env("SENTRY_DSN", default=None)
 if SENTRY_DSN:
