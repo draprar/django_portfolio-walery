@@ -23,7 +23,7 @@ class TestDocDiffView:
         url = reverse("docdiff:compare")
         response = client.post(url, {})
         assert response.status_code == 400
-        assert "proszę" in response.json()["error"].lower()
+        assert "please" in response.json()["error"].lower()
 
     def test_post_with_txt_files_returns_html_response(self, client):
         """
@@ -47,11 +47,12 @@ class TestDocDiffView:
         assert "raport" in content or "diff" in content
 
     def test_unsupported_extension_raises_valueerror(self, client):
-        """Unsupported file types should raise a ValueError."""
+        """Unsupported file types should return a 400 error with message."""
         url = reverse("docdiff:compare")
         bad_file = SimpleUploadedFile("file.xyz", b"abc")
-        with pytest.raises(ValueError):
-            client.post(url, {"file_old": bad_file, "file_new": bad_file})
+        response = client.post(url, {"file_old": bad_file, "file_new": bad_file})
+        assert response.status_code == 400
+        assert "unsupported" in response.json().get("error", "").lower()
 
 
 class TestDocDiffUrls:

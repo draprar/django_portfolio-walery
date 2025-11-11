@@ -182,16 +182,27 @@ def test_send_brevo_email_success(monkeypatch):
     from core import email as email_mod
 
     class DummyConfig:
-        def __init__(self): self.api_key = {}
+        def __init__(self):
+            self.api_key = {}
+
+    class DummyRestClient:
+        def __init__(self):
+            self.pool_manager = Mock(connection_pool_kw={})
+
+    class DummyApiClient:
+        def __init__(self, configuration):
+            self.rest_client = DummyRestClient()
 
     class DummyApi:
         def send_transac_email(self, payload):
             return {"messageId": "ok"}
 
-    def DummySendSmtpEmail(**kw): return {"payload": kw}
+    def DummySendSmtpEmail(**kw):
+        return {"payload": kw}
 
     dummy = Mock()
     dummy.Configuration = DummyConfig
+    dummy.ApiClient = DummyApiClient
     dummy.TransactionalEmailsApi = lambda client: DummyApi()
     dummy.SendSmtpEmail = DummySendSmtpEmail
 
@@ -199,18 +210,28 @@ def test_send_brevo_email_success(monkeypatch):
     res = email_mod.send_brevo_email("subject", "<p>x</p>", ["a@b.c"])
     assert res == {"messageId": "ok"}
 
-
 def test_send_brevo_email_handles_api_exception(monkeypatch):
     from core import email as email_mod
 
     class DummyConfig:
-        def __init__(self): self.api_key = {}
+        def __init__(self):
+            self.api_key = {}
+
+    class DummyRestClient:
+        def __init__(self):
+            self.pool_manager = Mock(connection_pool_kw={})
+
+    class DummyApiClient:
+        def __init__(self, configuration):
+            self.rest_client = DummyRestClient()
 
     class BrokenApi:
-        def send_transac_email(self, payload): raise Exception("boom")
+        def send_transac_email(self, payload):
+            raise Exception("boom")
 
     dummy = Mock()
     dummy.Configuration = DummyConfig
+    dummy.ApiClient = DummyApiClient
     dummy.TransactionalEmailsApi = lambda client: BrokenApi()
     dummy.SendSmtpEmail = lambda **kw: {"payload": kw}
 

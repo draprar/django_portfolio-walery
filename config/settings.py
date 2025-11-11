@@ -202,6 +202,20 @@ else:
         }
     }
 
+# --- Force SQLite + LocMemCache for pytest or Django test runner ---
+if any(arg in sys.argv for arg in ["test", "pytest"]):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "test_db.sqlite3",
+        }
+    }
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        }
+    }
+
 SENTRY_DSN = env("SENTRY_DSN", default=None)
 if SENTRY_DSN:
     import sentry_sdk
