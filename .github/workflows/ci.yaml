@@ -38,14 +38,6 @@ jobs:
           --health-retries 5
 
     steps:
-      - name: Wait for Redis to be ready
-        run: |
-          echo "Waiting for Redis..."
-          for i in {1..10}; do
-          (echo PING | nc -w 1 redis 6379 | grep PONG) && break
-          sleep 2
-          done
-
       - name: Check out the repository
         uses: actions/checkout@v3
 
@@ -91,6 +83,14 @@ jobs:
           echo "EMAIL_HOST_PASSWORD=" >> .env
           echo "DEFAULT_FROM_EMAIL=test@example.com" >> .env
           echo "CI=true" >> .env
+
+      - name: Wait for Redis to be ready
+        run: |
+          echo "Waiting for Redis..."
+          for i in {1..10}; do
+          (echo PING | nc -w 1 redis 6379 | grep PONG) && break
+          sleep 2
+          done  
 
       - name: Show .env (debug)
         run: |
@@ -149,6 +149,8 @@ jobs:
         run: |
           mkdir -p ./test-reports
           pytest -k "not test_upload_image_view_post" --disable-warnings --junitxml=./test-reports/results.xml
+        env:
+          REDIS_URL: redis://redis:6379/0
 
       - name: Store test results
         if: always()
