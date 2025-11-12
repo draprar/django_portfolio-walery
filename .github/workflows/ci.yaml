@@ -146,11 +146,11 @@ jobs:
           find . -name "*.pyc" -delete || true
 
       - name: Run tests with pytest
+        env:
+          REDIS_URL: redis://localhost:6379/0
         run: |
           mkdir -p ./test-reports
           pytest -k "not test_upload_image_view_post" --disable-warnings --junitxml=./test-reports/results.xml
-        env:
-          REDIS_URL: redis://redis:6379/0
 
       - name: Store test results
         if: always()
