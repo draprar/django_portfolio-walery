@@ -203,7 +203,7 @@ else:
     }
 
 # --- Force SQLite + LocMemCache for pytest or Django test runner ---
-if any(arg in sys.argv for arg in ["test", "pytest"]):
+if any(arg in sys.argv for arg in ["test", "pytest"]) and not os.environ.get("CI"):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
