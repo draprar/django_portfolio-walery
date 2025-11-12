@@ -38,6 +38,14 @@ jobs:
           --health-retries 5
 
     steps:
+      - name: Wait for Redis to be ready
+        run: |
+          echo "Waiting for Redis..."
+          for i in {1..10}; do
+          (echo PING | nc -w 1 redis 6379 | grep PONG) && break
+          sleep 2
+          done
+
       - name: Check out the repository
         uses: actions/checkout@v3
 
