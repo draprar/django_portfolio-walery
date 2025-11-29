@@ -16,13 +16,19 @@ from sklearn.cluster import KMeans
 import numpy as np
 
 # Load the Polish language model
-try:
-    nlp = spacy.load("pl_core_news_sm")
-except OSError:
-    raise RuntimeError("spaCy model 'pl_core_news_md' is not installed. Run:\n"
-                       "python -m spacy download pl_core_news_md")
+_nlp = None
+def nlp():
+    global _nlp
+    if _nlp is not None:
+        return _nlp
+    try:
+        _nlp = spacy.load("pl_core_news_sm")
+    except Exception as e:
+        # Fallback
+        print(f"[WARN] spaCy model failed to load: {e}")
+        _nlp = None
+    return _nlp
 
-# Entity categories of interest
 NER_MAP = {
     "PER": "person",
     "ORG": "organization",
@@ -36,7 +42,6 @@ NER_MAP = {
     "PRODUCT": "product",
     "WORK_OF_ART": "title/work",
 }
-
 
 # ----------------------------------------------------------
 # BASIC FUNCTIONS

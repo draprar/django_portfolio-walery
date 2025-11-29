@@ -431,6 +431,18 @@
 	  pointer-events: none;
 	  mix-blend-mode: screen; /* efekt przezroczystości na twarzy */
 	}
+
+	#glitchCanvas {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+      mix-blend-mode: screen; /* <<< najważniejsze — jak na lewej stronie */
+    }
+
 	.card-style:hover {
 	  transform: translateY(-5px);
 	  border-color: var(--primary);
@@ -517,4 +529,60 @@ ul.list-inline.small a:hover {
   width: 1px !important;
   height: 1px !important;
   overflow: hidden !important;
+}
+/* === MOBILE NAVBAR — brand left / lang center / burger right + fixed spacing === */
+@media (max-width: 991.98px) {
+
+  .navbar {
+    padding-top: 0.8rem;        /* przywraca odstęp pionowy */
+    padding-bottom: 0.8rem;
+    min-height: 60px;           /* zapobiega spłaszczeniu po absolute */
+  }
+
+  .navbar .container {
+    position: relative;         /* anchor dla elementów absolutnych */
+  }
+
+  /* LEWO — Walery */
+  .navbar-brand {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1060;
+    white-space: nowrap;
+  }
+
+  /* PRAWO — Burger */
+  .navbar-toggler {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1070;
+  }
+
+  /* ŚRODEK — EN / PL */
+  .lang-switcher.d-lg-none {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1055;
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  /* przyciski językowe — aby nie rozpychały navbaru */
+  .lang-switcher.d-lg-none .lang-btn {
+    padding-left: 0.45rem;
+    padding-right: 0.45rem;
+    min-width: 38px;
+    text-align: center;
+  }
+
+  /* rozwinięte menu nad treścią, ale pod togglerem */
+  .navbar-collapse {
+    z-index: 1040;
+  }
 }

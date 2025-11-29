@@ -38,12 +38,12 @@
 
     <!-- ŚRODEK: EN/PL (MOBILE) -->
     <div class="lang-switcher d-lg-none d-flex justify-content-center mx-auto my-0">
-      <button class="btn btn-sm btn-outline-secondary me-1 lang-btn" data-lang="en" onclick="switchLang('en')">EN</button>
-      <button class="btn btn-sm btn-outline-secondary lang-btn" data-lang="pl" onclick="switchLang('pl')">PL</button>
+      <button class="btn btn-sm btn-outline-secondary me-1 lang-btn" data-lang="en" aria-pressed="false">EN</button>
+      <button class="btn btn-sm btn-outline-secondary lang-btn" data-lang="pl" aria-pressed="false">PL</button>
     </div>
 
     <!-- NAVIGATION -->
-    <div class="collapse navbar-collapse" id="navbarNav"> <!-- usunięte 'show' -->
+    <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto w-100" id="navbarScrollSpy">
         <li class="nav-item"><a class="nav-link" href="#about" data-en="About" data-pl="O mnie">About</a></li>
         <li class="nav-item"><a class="nav-link" href="#services" data-en="What I Offer" data-pl="Oferta">What I Offer</a></li>
@@ -67,8 +67,8 @@
 
       <!-- DESKTOP: LANG -->
       <div class="lang-switcher d-none d-lg-flex align-items-center ms-3 gap-2">
-        <button class="btn btn-sm btn-outline-secondary lang-btn" data-lang="en" onclick="switchLang('en')">EN</button>
-        <button class="btn btn-sm btn-outline-secondary lang-btn" data-lang="pl" onclick="switchLang('pl')">PL</button>
+        <button class="btn btn-sm btn-outline-secondary lang-btn" data-lang="en" aria-pressed="false">EN</button>
+        <button class="btn btn-sm btn-outline-secondary lang-btn" data-lang="pl" aria-pressed="false">PL</button>
       </div>
     </div>
   </div>
@@ -76,7 +76,7 @@
 
 <!-- Desktop Split Section -->
 <section class="split-section">
-  <div class="half left" aria-hidden="true" aria-label="Engineer side – code, automation, analysis">
+    <div class="half left" id="matrix-trigger" aria-hidden="true" aria-label="Engineer side – code, automation, analysis">
     <div class="text-box left-text ">
       <h2 class="text-uppercase" data-en="ENGINEER" data-pl="INŻYNIER">ENGINEER</h2>
       <p data-en="Engineering is more than code and schematics — it's a way of thinking about data and technology as tools to create value."
@@ -95,6 +95,7 @@
         Art, design and storytelling are three languages I use to convey ideas — in projects, space, and form itself.
       </p>
     </div>
+    <canvas id="glitchCanvas"></canvas>
   </div>
 </section>
 
@@ -140,7 +141,6 @@
     PS. Even if your idea doesn’t fit the listed areas, write to me — we’ll figure something out.
   </p>
 </section>
-
 
 <!-- Services Section -->
 <section id="services" class="container" data-aos="fade-up">

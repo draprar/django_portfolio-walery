@@ -317,19 +317,30 @@ SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
 
 # Start in report-only mode
-SECURE_CSP_REPORT_ONLY = False
+SECURE_CSP_REPORT_ONLY = True
 SECURE_CSP = {
-    # Main default
     "default-src": "'self'",
-    # Allow all images from HTTPS and inline data (for icons, etc.)
+    "script-src": (
+        "'self' "
+        "https://cdn.jsdelivr.net "
+        "https://unpkg.com "
+        "https://www.instagram.com "
+        "https://use.fontawesome.com "
+        "https://code.jquery.com "
+        "'unsafe-inline'"
+    ),
+    "style-src": (
+        "'self' "
+        "https://fonts.googleapis.com "
+        "https://cdn.jsdelivr.net "
+        "https://cdnjs.cloudflare.com "
+        "https://unpkg.com "
+        "'unsafe-inline'"
+    ),
     "img-src": "'self' data: https:",
-    # Allow JS from self and trusted CDNs
-    "script-src": "'self' https://cdn.jsdelivr.net https://unpkg.com",
-    # Allow CSS from self and trusted CDNs (Bootstrap, FontAwesome, AOS, Google Fonts)
-    "style-src": "'self' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com",
-    # Allow fonts from trusted CDNs
-    "font-src": "'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
-    # Disallow embedding site in iframes
+    "font-src": "'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:",
+    "connect-src": "'self' https://cdn.jsdelivr.net https://unpkg.com",
+    "frame-src": "'self' https://www.youtube.com",
     "frame-ancestors": "'none'",
 }
 
