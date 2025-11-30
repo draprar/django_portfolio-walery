@@ -216,13 +216,6 @@ if any(arg in sys.argv for arg in ["test", "pytest"]) and not os.environ.get("CI
         }
     }
 
-SENTRY_DSN = env("SENTRY_DSN", default=None)
-if SENTRY_DSN:
-    import sentry_sdk
-    from sentry_sdk.integrations.redis import RedisIntegration
-    sentry_sdk.init(dsn=SENTRY_DSN, integrations=[RedisIntegration()], traces_sample_rate=1.0, send_default_pii=False)
-
-
 # JWT configuration
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
