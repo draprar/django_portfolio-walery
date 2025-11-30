@@ -29,7 +29,23 @@ let dropsRight = [];
 const lettersLeft = "01".split("");
 
 // Right side uses monospaced-friendly unicode symbols (monochrome & colorable)
-const lettersRight = ["✦","✧","✺","✿","❖","✭","✽"];
+const lettersRight = [
+    // Engineering / Production
+    "🔧","🔩","🏭","⚙️","🔌",
+
+    // Programming & Python
+    "🐍","💻","⌨️","🧠",
+
+    // Data / ML / Analysis
+    "📊","📈","📉","📑","🤖",
+
+    // Documentation / Standards / Reports
+    "📝","📘","📄","📂",
+
+    // Creativity & Design
+    "🎨","✏️","🖌️","🧩","✒️"
+];
+
 
 // Toggles – only one side active at a time
 let matrixEnabled = true;
@@ -65,7 +81,7 @@ function resizeAll() {
   rightCanvas.width = rightContainer.offsetWidth;
   rightCanvas.height = rightContainer.offsetHeight;
   columnsRight = Math.max(1, Math.floor(rightCanvas.width / fontSizeRight));
-  dropsRight = Array(columnsRight).fill(1);
+  dropsRight = Array.from({ length: columnsRight }, () => -Math.floor(Math.random()*100));
 }
 
 // Debounce resize for performance
