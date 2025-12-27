@@ -9,14 +9,24 @@ import html
 
 _LOGGER = logging.getLogger(__name__)
 
+def _safe_str(value: Any) -> str:
+    if isinstance(value, str):
+        return value
+    if value is None:
+        return ""
+    return str(value)
 
 def html_inline_diff(a: str, b: str) -> str:
     """
     Returns a combination of 'a' and 'b' with <del> and <ins> tags.
     Safely escapes source fragments before wrapping them in HTML tags.
     """
+    a = _safe_str(a)
+    b = _safe_str(b)
+
     sm = SequenceMatcher(None, a, b)
     parts: List[str] = []
+
     for tag, i1, i2, j1, j2 in sm.get_opcodes():
         if tag == "equal":
             parts.append(html.escape(a[i1:i2]))
@@ -120,11 +130,11 @@ def compare_blocks(old_blocks: List[Dict[str, Any]], new_blocks: List[Dict[str, 
                 entry: Dict[str, Any] = {"change": "changed", "old": old, "new": new}
                 try:
                     if old.get("type") == "paragraph" and new.get("type") == "paragraph":
-                        entry["inline_html"] = html_inline_diff(old.get("text", ""), new.get("text", ""))
+                        entry["inline_html"] = html_inline_diff(_safe_str(old.get("text")), _safe_str(new.get("text")),)
                     elif old.get("type") == "table" and new.get("type") == "table":
                         entry["table_changes"] = _diff_tables(old.get("table", []), new.get("table", []))
-                except Exception:
-                    _LOGGER.debug("Error while generating diff details", exc_info=True)
+                except Exception as e:
+                    _LOGGER.warning("Failed to generate diff details for block", exc_info=True)
                 result.append(entry)
             # Handle leftover deletions
             for i in range(i1 + len_pairs, i2):

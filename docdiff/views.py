@@ -5,6 +5,7 @@ from pathlib import Path
 import tempfile
 import shutil
 
+from .extractors.normalize import normalize_blocks
 from .extractors.extract_docx import DocxExtractor
 from .extractors.extract_xlsx import XlsxExtractor
 from .extractors.extract_txt import TxtExtractor
@@ -81,19 +82,63 @@ def docdiff_view(request):
         new_extractor = get_extractor(new_path)
 
         # Extraction and comparison
-        old_blocks = old_extractor.extract_blocks(old_path)
-        new_blocks = new_extractor.extract_blocks(new_path)
+        try:
+            old_blocks = old_extractor.extract_blocks(old_path)
+            new_blocks = new_extractor.extract_blocks(new_path)
+        except Exception as e:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+            return JsonResponse(
+                {"error": f"Failed to extract document content: {e}"},
+                status=400,
+            )
+
+        if not old_blocks and not new_blocks:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+            return JsonResponse(
+                {"error": "No readable content found in documents."},
+                status=400,
+            )
+
         diff_result = compare_blocks(old_blocks, new_blocks)
 
         # Prevent excessive AI processing
-        if len(diff_result) > 1000:
+        changed_blocks = [b for b in diff_result if b.get("change") == "changed"]
+        if len(changed_blocks) > 300:
             shutil.rmtree(temp_dir, ignore_errors=True)
-            return JsonResponse({"error": "File too large for AI analysis."}, status=400)
+            return JsonResponse(
+                {"error": "Too many changes for AI analysis."},
+                status=400,
+            )
 
         # AI semantic analysis
         for block in diff_result:
-            ai_info = analyze_change(block)
-            block.update(ai_info)
+            if block.get("change") != "changed":
+                continue
+
+            old_type = block.get("old", {}).get("type")
+            new_type = block.get("new", {}).get("type")
+
+            # AI text only
+            if old_type != "paragraph" or new_type != "paragraph":
+                block.update({
+                    "labels": [],
+                    "semantic_score": None,
+                    "change_type": "structural",
+                    "confidence": 1.0,
+                })
+                continue
+
+            try:
+                ai_info = analyze_change(block)
+                block.update(ai_info)
+            except Exception as e:
+                # AI failure must not kill the request
+                block.update({
+                    "labels": [],
+                    "semantic_score": None,
+                    "change_type": "ai_error",
+                    "confidence": 0.0,
+                })
 
         # Generate report
         output_html = temp_dir / "report.html"
