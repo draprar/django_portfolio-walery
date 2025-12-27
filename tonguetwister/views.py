@@ -1,4 +1,5 @@
 import sentry_sdk
+from core.email import send_brevo_email
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.mail import send_mail
@@ -655,12 +656,9 @@ def send_activation_email(user, request):
         html_message = render_to_string('tonguetwister/registration/activation.html', {'user': user, 'activation_link': activation_link})
         plain_message = strip_tags(html_message)
 
-        # Sets the sender's email and recipient (user's email)
-        from_email = settings.EMAIL_HOST_USER
-        to = user.email
-
-        # Sends the email with both HTML and plain text versions
-        send_mail(subject, plain_message, from_email, [to], html_message=html_message)
+        # Send e-mail
+        recipient_list = [user.email]
+        send_brevo_email(subject, html_message, recipient_list)
     except Exception as e:
         sentry_sdk.capture_exception(e)
         print(f"Błąd przy wysyłaniu e-maila: {e}")
@@ -745,14 +743,8 @@ def password_reset_view(request):
 
             # Sends the password reset email
             subject = 'Resetuj swoje hasło'
-            from_email = settings.EMAIL_HOST_USER
-            send_mail(
-                subject,
-                plain_message,
-                from_email,
-                [email],
-                html_message=html_message
-            )
+            recipient_list = [email]
+            send_brevo_email(subject, html_message, recipient_list)
             return redirect('password_reset_done')
         except User.DoesNotExist:
             sentry_sdk.capture_message(f'Nieudana próba resetowania hasła dla: {email}', level='warning')
