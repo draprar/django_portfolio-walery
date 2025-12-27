@@ -62,7 +62,6 @@ def extract_docx_blocks(path: Path) -> List[Dict[str, Any]]:
                     }
                 )
 
-            # obrazy powiązane z paragrafem
             for run in para_obj.runs:
                 try:
                     blips = run._element.findall(".//a:blip", namespaces)
