@@ -170,7 +170,7 @@ def test_compare_blocks_handles_exception_during_diff(monkeypatch, caplog):
     with caplog.at_level(logging.DEBUG):
         result = compare_blocks(old, new)
 
-    assert any("Error while generating diff details" in msg for msg in caplog.messages)
+    assert any("Failed to generate diff details" in msg for msg in caplog.messages)
     assert result[0]["change"] == "changed"
 
 

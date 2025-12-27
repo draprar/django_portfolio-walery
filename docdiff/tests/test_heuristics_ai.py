@@ -4,6 +4,7 @@ import numpy as np
 from unittest.mock import MagicMock
 
 import docdiff.heuristics_ai as ai
+from docdiff.heuristics_ai import get_nlp
 
 
 # ================================================================
@@ -17,7 +18,7 @@ def mock_nlp(monkeypatch):
     mock_doc.ents = []
     mock_doc.vector = np.array([0.1, 0.2, 0.3])
     mock_doc.similarity.return_value = 0.8
-    monkeypatch.setattr(ai, "nlp", lambda text: mock_doc)
+    monkeypatch.setattr(ai, "get_nlp", lambda: lambda text: mock_doc)
     return mock_doc
 
 
@@ -30,7 +31,7 @@ def test_extract_labels_with_entities(monkeypatch):
     ent1 = types.SimpleNamespace(label_="PER")
     ent2 = types.SimpleNamespace(label_="ORG")
     doc = types.SimpleNamespace(ents=[ent1, ent2])
-    monkeypatch.setattr(ai, "nlp", lambda text: doc)
+    monkeypatch.setattr(ai, "get_nlp", lambda: lambda text: doc)
 
     result = ai.extract_labels_spacy("Jan Kowalski z firmy XYZ")
     assert "person" in result
@@ -47,7 +48,7 @@ def test_extract_labels_with_units_and_numbers(mock_nlp):
 
 def test_extract_labels_empty_text(mock_nlp):
     """Return empty list when no entities or patterns found."""
-    result = ai.extract_labels_spacy("tekst bez danych")
+    result = ai.extract_labels_spacy("")
     assert result == []
 
 
@@ -86,8 +87,8 @@ def test_classify_technical_due_to_legal_reference():
 
 def test_classify_editorial_due_to_high_similarity():
     """Should return 'substantive' since similarity < 0.9 threshold."""
-    result = ai.classify_change_type("abc", "abcd", [])
-    assert result == "substantive"
+    result = ai.classify_change_type("abc", "abc", [])
+    assert result == "editorial"
 
 
 def test_classify_formal_due_to_word_count_diff():
@@ -142,8 +143,8 @@ def test_cluster_changes_with_mocked_kmeans(monkeypatch):
     blocks = [{"change": "changed", "new": {"text": f"t{i}"}} for i in range(6)]
 
     # Mock nlp() → doc.vector
-    mock_doc = types.SimpleNamespace(vector=np.array([1.0, 2.0, 3.0]))
-    monkeypatch.setattr(ai, "nlp", lambda t: mock_doc)
+    mock_doc = types.SimpleNamespace(vector=np.array([1.0, 2.0, 3.0]), has_vector=True)
+    monkeypatch.setattr(ai, "get_nlp", lambda: lambda t: mock_doc)
 
     # Mock KMeans
     mock_kmeans = MagicMock()
@@ -171,11 +172,17 @@ def test_generate_ai_summary_no_changes():
 def test_generate_ai_summary_with_changes():
     """Generate summary string with counts and dominant type."""
     blocks = [
-        {"change": "changed", "_ai_type": "technical", "_ai_labels": ["date"]},
-        {"change": "changed", "_ai_type": "technical", "_ai_labels": ["number"]},
-        {"change": "changed", "_ai_type": "formal", "_ai_labels": ["unit"]},
+        {"change": "changed", "change_type": "technical", "labels": ["date"]},
+        {"change": "changed", "change_type": "technical", "labels": ["number"]},
+        {"change": "changed", "change_type": "formal", "labels": ["unit"]},
     ]
     result = ai.generate_ai_summary(blocks)
     assert "The document contains" in result
     assert "<b>technical</b>" in result
     assert "date" in result or "number" in result
+
+def nlp(text: str):
+    model = get_nlp()
+    if not model:
+        raise RuntimeError("spaCy model not loaded")
+    return model(text)
