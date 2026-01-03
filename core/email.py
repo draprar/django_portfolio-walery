@@ -18,11 +18,12 @@ def send_brevo_email(subject, html_content, recipient_list):
     subject = bleach.clean(subject, strip=True)
     html_content = bleach.clean(
         html_content,
-        tags=['p', 'b', 'br', 'i', 'strong', 'a'],
-        attributes={'a': ['href']}
+        tags=['p', 'br', 'strong', 'b', 'i', 'a'],
+        attributes={'a': ['href']},
+        strip=True
     )
 
-    sender = {"name": "Moja Aplikacja", "email": settings.DEFAULT_FROM_EMAIL}
+    sender = {"name": "Walery", "email": settings.DEFAULT_FROM_EMAIL}
     to = [{"email": email} for email in recipient_list]
 
     send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(

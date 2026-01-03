@@ -5,6 +5,7 @@ from django.http import JsonResponse, HttpResponseNotAllowed
 from django.shortcuts import render
 from django.views import View
 from django.utils.decorators import method_decorator
+from django.utils.html import escape
 
 from django_ratelimit.decorators import ratelimit
 
@@ -78,17 +79,19 @@ class ContactView(View):
             # Persist (but avoid logging saved content)
             form.save()
 
-            subject = "New Portfolio Contact"
+            subject = "Kontakt"
             # Build email body from cleaned_data. We must include the message in the mail,
             # but do not log the content anywhere.
             name = form.cleaned_data.get("name", "Unknown")
             email = form.cleaned_data.get("email", "")
             message_body = form.cleaned_data.get("message", "")
 
+            safe_message = escape(message_body).replace("\n", "<br>")
+
             html_content = f"""
-                <h2>Message from {name}</h2>
-                <p><strong>Email:</strong> {email}</p>
-                <div>{message_body}</div>
+                <p><strong>Message from:</strong> {escape(name)}</p>
+                <p><strong>Email:</strong> {escape(email)}</p>
+                <p>{safe_message}</p>
             """
 
             recipient_list = [settings.DEFAULT_FROM_EMAIL]

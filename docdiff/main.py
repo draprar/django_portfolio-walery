@@ -14,6 +14,7 @@ from docdiff.extractors.extract_xlsx import XlsxExtractor
 
 _LOGGER = logging.getLogger(__name__)
 
+FILE_TYPE_MISMATCH = 7
 
 class ExitCode(IntEnum):
     OK = 0
@@ -31,6 +32,13 @@ EXTRACTOR_MAP = {
     ".xls": XlsxExtractor,
 }
 
+FORMAT_GROUP = {
+    ".txt": "txt",
+    ".doc": "docx",
+    ".docx": "docx",
+    ".xls": "xlsx",
+    ".xlsx": "xlsx",
+}
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Compare two files and generate a report.")
@@ -57,6 +65,21 @@ def choose_extractor(path: Path):
         )
     return cls()
 
+def validate_files(old: Path, new: Path) -> None:
+    old_ext = old.suffix.lower()
+    new_ext = new.suffix.lower()
+
+    if old_ext not in FORMAT_GROUP:
+        raise ValueError(f"Unsupported file format: {old_ext}")
+
+    if new_ext not in FORMAT_GROUP:
+        raise ValueError(f"Unsupported file format: {new_ext}")
+
+    if FORMAT_GROUP[old_ext] != FORMAT_GROUP[new_ext]:
+        raise ValueError(
+            f"File format mismatch: {old_ext} vs {new_ext}. "
+            "Both files must have the same format."
+        )
 
 def main() -> int:
     args = parse_args()
@@ -70,11 +93,16 @@ def main() -> int:
         return ExitCode.NEW_NOT_FOUND
 
     try:
+        validate_files(args.old, args.new)
+
         old_ex = choose_extractor(args.old)
         new_ex = choose_extractor(args.new)
 
         old_blocks = old_ex.extract_blocks(args.old)
         new_blocks = new_ex.extract_blocks(args.new)
+    except ValueError as exc:
+        _LOGGER.error(str(exc))
+        return ExitCode.FILE_TYPE_MISMATCH
     except Exception as exc:
         _LOGGER.exception("Error while parsing documents: %s", exc)
         return ExitCode.PARSE_ERROR

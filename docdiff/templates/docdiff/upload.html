@@ -14,6 +14,12 @@
      Compare two DOCX, XLSX or TXT files with AI-powered difference detection.
   </p>
 
+  {% if error %}
+    <div class="alert alert-danger text-center">
+      {{ error }}
+    </div>
+  {% endif %}
+
   <form method="POST" enctype="multipart/form-data" class="p-4 rounded shadow-sm bg-light">
     {% csrf_token %}
     <div class="mb-3">

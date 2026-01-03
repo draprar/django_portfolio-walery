@@ -22,6 +22,11 @@ ALLOWED_MIME = {
     ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     ".txt": "text/plain",
 }
+FORMAT_GROUP = {
+    ".txt": "txt",
+    ".docx": "docx",
+    ".xlsx": "xlsx",
+}
 
 def validate_upload(upload):
     """Validate uploaded file extension, MIME and size."""
@@ -34,6 +39,15 @@ def validate_upload(upload):
         if upload.content_type != ALLOWED_MIME.get(ext, ""):
             raise ValueError(f"Invalid MIME type: {upload.content_type}")
 
+def validate_file_pair(file_old, file_new):
+    ext_old = Path(file_old.name).suffix.lower()
+    ext_new = Path(file_new.name).suffix.lower()
+
+    if FORMAT_GROUP.get(ext_old) != FORMAT_GROUP.get(ext_new):
+        raise ValueError(
+            f"File format mismatch: {ext_old} vs {ext_new}. "
+            "Both files must be of the same type."
+        )
 
 @require_http_methods(["GET", "POST"])
 def docdiff_view(request):
@@ -46,14 +60,23 @@ def docdiff_view(request):
         file_new = request.FILES.get("file_new")
 
         if not file_old or not file_new:
-            return JsonResponse({"error": "Please upload both files."}, status=400)
+            return render(
+                request,
+                "docdiff/upload.html",
+                {"error": "Please upload both files."}
+            )
 
         # Validate uploads
         try:
             validate_upload(file_old)
             validate_upload(file_new)
+            validate_file_pair(file_old, file_new)
         except ValueError as e:
-            return JsonResponse({"error": str(e)}, status=400)
+            return render(
+                request,
+                "docdiff/upload.html",
+                {"error": str(e)}
+            )
 
         # Temporary storage
         temp_dir = Path(tempfile.mkdtemp())
@@ -85,18 +108,20 @@ def docdiff_view(request):
         try:
             old_blocks = old_extractor.extract_blocks(old_path)
             new_blocks = new_extractor.extract_blocks(new_path)
-        except Exception as e:
+        except Exception:
             shutil.rmtree(temp_dir, ignore_errors=True)
-            return JsonResponse(
-                {"error": f"Failed to extract document content: {e}"},
-                status=400,
+            return render(
+                request,
+                "docdiff/upload.html",
+                {"error": "Failed to read document content. Make sure the file is not corrupted."}
             )
 
         if not old_blocks and not new_blocks:
             shutil.rmtree(temp_dir, ignore_errors=True)
-            return JsonResponse(
-                {"error": "No readable content found in documents."},
-                status=400,
+            return render(
+                request,
+                "docdiff/upload.html",
+                {"error": "No readable content found in documents."}
             )
 
         diff_result = compare_blocks(old_blocks, new_blocks)
@@ -105,9 +130,10 @@ def docdiff_view(request):
         changed_blocks = [b for b in diff_result if b.get("change") == "changed"]
         if len(changed_blocks) > 300:
             shutil.rmtree(temp_dir, ignore_errors=True)
-            return JsonResponse(
-                {"error": "Too many changes for AI analysis."},
-                status=400,
+            return render(
+                request,
+                "docdiff/upload.html",
+                {"error": "Too many changes to analyze. Try smaller documents."}
             )
 
         # AI semantic analysis

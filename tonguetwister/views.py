@@ -7,7 +7,7 @@ from django.core.cache import cache
 from django.http import JsonResponse, HttpResponse
 from django.urls import reverse
 from django.utils.encoding import force_bytes, force_str
-from django.utils.html import strip_tags
+from django.utils.html import strip_tags, escape
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -644,19 +644,54 @@ def login_view(request):
 
 def send_activation_email(user, request):
     try:
-        # Prepares the email subject and token for account activation
+        # Subject
         subject = 'Witamy na pokładzie!'
-        token = account_activation_token.make_token(user)  # generates an activation token for the user
-        uid = urlsafe_base64_encode(force_bytes(user.pk))  # encodes the user's primary key
 
-        # Builds the activation link with the user's uid and token
+        # Token and UID
+        token = account_activation_token.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+        # Activation link
         activation_link = request.build_absolute_uri(reverse('activate', args=[uid, token]))
 
-        # Renders an HTML template for the email body and generates a plain text version
-        html_message = render_to_string('tonguetwister/registration/activation.html', {'user': user, 'activation_link': activation_link})
-        plain_message = strip_tags(html_message)
+        # Safe data inj
+        username = escape(user.username)
+        safe_link = escape(activation_link)
 
-        # Send e-mail
+        # HTML
+        html_message = f"""
+        <p><strong>Czołem, {username}!</strong></p>
+
+        <p>
+        Dziękujemy za rejestrację w LingwoŁamkach.
+        Aby aktywować konto i potwierdzić adres e-mail, kliknij w poniższy link:
+        </p>
+
+        <p>
+        <a href="{safe_link}">
+        Aktywuj swoje konto
+        </a>
+        </p>
+
+        <p>
+        Jeżeli link nie działa, skopiuj go i wklej do przeglądarki:<br>
+        {safe_link}
+        </p>
+
+        <p>
+        <strong>Potrzebujesz pomocy?</strong><br>
+        <a href="mailto:kontakt@walery.online">
+        Z radością odpowiemy na Twoje pytania.
+        </a>
+        </p>
+
+        <p>
+        Pozdrawiamy<br>
+        <strong>Zespół LingwoŁamki</strong>
+        </p>
+        """
+
+        # Send mail
         recipient_list = [user.email]
         send_brevo_email(subject, html_message, recipient_list)
     except Exception as e:
@@ -709,47 +744,68 @@ def activate(request, uidb64, token):
 
 @csrf_protect
 def password_reset_view(request):
-    # Handles the password reset process
     if request.method == 'POST':
         email = request.POST.get('email')
+
         try:
-            # Tries to find the user based on the provided email
             user = User.objects.get(email=email)
-            token = default_token_generator.make_token(user)  # generates a reset token
-            uid = urlsafe_base64_encode(force_bytes(user.pk))  # encodes the user's ID
 
-            # Hold token in redis
-            cache.set(f'password_reset_{uid}', token, timeout=600)  # 10 min
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-            # Constructs a password reset link and email message
+            # Redis – 10 min
+            cache.set(f'password_reset_{uid}', token, timeout=600)
+
             reset_link = request.build_absolute_uri(
                 reverse('password_reset_confirm', args=[uid, token])
             )
-            plain_message = f"""
-            Resetuj hasło
 
-            Czołem {user.username},
+            # ---------- HTML MAIL (mail-safe) ----------
+            html_message = f"""
+            <p>Czołem <strong>{escape(user.username)}</strong>,</p>
 
-            Otrzymaliśmy prośbę o zresetowanie hasła do Twojego konta. Kliknij poniższy link, aby je zresetować:
-            {reset_link}
+            <p>
+                Otrzymaliśmy prośbę o zresetowanie hasła do Twojego konta.
+                Kliknij poniższy link, aby je zresetować:
+            </p>
 
-            Jeśli to nie Ty prosiłeś o zresetowanie hasła, po prostu zignoruj tę wiadomość. Twoje hasło pozostanie bez zmian.
+            <p>
+                <a href="{escape(reset_link)}">{escape(reset_link)}</a>
+            </p>
 
-            Pozdrawiamy,
-            Zespół LingwoŁamki
+            <p>
+                Jeśli to nie Ty prosiłeś o zresetowanie hasła,
+                po prostu zignoruj tę wiadomość.
+                Twoje hasło pozostanie bez zmian.
+            </p>
+
+            <p>
+                Pozdrawiamy<br>
+                <strong>Zespół LingwoŁamki</strong>
+            </p>
             """
-            context = {'reset_link': reset_link, 'user': user}
-            html_message = render_to_string('tonguetwister/registration/password_reset_email.html', context)
 
-            # Sends the password reset email
             subject = 'Resetuj swoje hasło'
             recipient_list = [email]
+
             send_brevo_email(subject, html_message, recipient_list)
+
             return redirect('password_reset_done')
+
         except User.DoesNotExist:
-            sentry_sdk.capture_message(f'Nieudana próba resetowania hasła dla: {email}', level='warning')
-            messages.error(request, 'Nie znaleziono użytkownika z tym adresem email.')
-    return render(request, 'tonguetwister/registration/password_reset_form.html')
+            sentry_sdk.capture_message(
+                f'Nieudana próba resetowania hasła dla: {email}',
+                level='warning'
+            )
+            messages.error(
+                request,
+                'Nie znaleziono użytkownika z tym adresem email.'
+            )
+
+    return render(
+        request,
+        'tonguetwister/registration/password_reset_form.html'
+    )
 
 
 @csrf_protect
