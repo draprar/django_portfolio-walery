@@ -28,26 +28,35 @@ FORMAT_GROUP = {
     ".xlsx": "xlsx",
 }
 
+# Error codes for frontend i18n
+ERROR_CODES = {
+    "missing_files": "missing_files",
+    "unsupported_type": "unsupported_type",
+    "file_too_large": "file_too_large",
+    "mime_invalid": "mime_invalid",
+    "format_mismatch": "format_mismatch",
+    "extract_failed": "extract_failed",
+    "empty_documents": "empty_documents",
+    "too_many_changes": "too_many_changes",
+}
+
 def validate_upload(upload):
     """Validate uploaded file extension, MIME and size."""
     ext = Path(upload.name).suffix.lower()
     if ext not in ALLOWED_EXTENSIONS:
-        raise ValueError(f"Unsupported file type: {ext}")
+        raise ValueError(ERROR_CODES["unsupported_type"])
     if upload.size > MAX_FILE_SIZE_MB * 1024 * 1024:
-        raise ValueError(f"File too large: {upload.size / 1024**2:.1f} MB")
+        raise ValueError(ERROR_CODES["file_too_large"])
     if hasattr(upload, "content_type"):
         if upload.content_type != ALLOWED_MIME.get(ext, ""):
-            raise ValueError(f"Invalid MIME type: {upload.content_type}")
+            raise ValueError(ERROR_CODES["mime_invalid"])
 
 def validate_file_pair(file_old, file_new):
     ext_old = Path(file_old.name).suffix.lower()
     ext_new = Path(file_new.name).suffix.lower()
 
     if FORMAT_GROUP.get(ext_old) != FORMAT_GROUP.get(ext_new):
-        raise ValueError(
-            f"File format mismatch: {ext_old} vs {ext_new}. "
-            "Both files must be of the same type."
-        )
+        raise ValueError(ERROR_CODES["format_mismatch"])
 
 @require_http_methods(["GET", "POST"])
 def docdiff_view(request):
@@ -63,7 +72,7 @@ def docdiff_view(request):
             return render(
                 request,
                 "docdiff/upload.html",
-                {"error": "Please upload both files."}
+                {"error_code": ERROR_CODES["missing_files"]}
             )
 
         # Validate uploads
@@ -75,7 +84,7 @@ def docdiff_view(request):
             return render(
                 request,
                 "docdiff/upload.html",
-                {"error": str(e)}
+                {"error_code": str(e)}
             )
 
         # Temporary storage
@@ -113,7 +122,7 @@ def docdiff_view(request):
             return render(
                 request,
                 "docdiff/upload.html",
-                {"error": "Failed to read document content. Make sure the file is not corrupted."}
+                {"error_code": ERROR_CODES["extract_failed"]}
             )
 
         if not old_blocks and not new_blocks:
@@ -121,7 +130,7 @@ def docdiff_view(request):
             return render(
                 request,
                 "docdiff/upload.html",
-                {"error": "No readable content found in documents."}
+                {"error_code": ERROR_CODES["empty_documents"]}
             )
 
         diff_result = compare_blocks(old_blocks, new_blocks)
@@ -133,7 +142,7 @@ def docdiff_view(request):
             return render(
                 request,
                 "docdiff/upload.html",
-                {"error": "Too many changes to analyze. Try smaller documents."}
+                {"error_code": ERROR_CODES["too_many_changes"]}
             )
 
         # AI semantic analysis

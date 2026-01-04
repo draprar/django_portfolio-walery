@@ -443,6 +443,17 @@ document.addEventListener('DOMContentLoaded', initFilters);
 
         # body start
         f.write("</head><body><div class='container'>")
+        f.write("""
+        <div style="margin-bottom:12px;font-size:1.1em; display:flex; justify-content:space-between; align-items:center;">
+          <a href="/docdiff/" style="text-decoration:none;color:var(--accent);">
+            ← <span data-i18n="back">Back to DocDiff</span>
+          </a>
+          <div>
+            <button class="chip lang-btn" data-lang="en">EN</button>
+            <button class="chip lang-btn" data-lang="pl">PL</button>
+          </div>
+        </div>
+        """)
         f.write("<div class='header'><div><h1>Document Comparison Report</h1>")
         f.write(f"<div class='small'>Total blocks: {len(block_diffs)}</div></div>")
 

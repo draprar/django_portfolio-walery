@@ -14,9 +14,10 @@
      Compare two DOCX, XLSX or TXT files with AI-powered difference detection.
   </p>
 
-  {% if error %}
-    <div class="alert alert-danger text-center">
-      {{ error }}
+  {% if error_code %}
+    <div class="alert alert-danger text-center"
+       id="docdiff-error"
+       data-error="{{ error_code }}">
     </div>
   {% endif %}
 
@@ -39,4 +40,40 @@
             data-pl="Porównaj dokumenty">Compare documents</button>
   </form>
 </div>
+
+<div id="docdiff-messages" class="d-none">
+  <span data-key="missing_files"
+        data-en="Please upload both files."
+        data-pl="Wgraj oba pliki."></span>
+
+  <span data-key="format_mismatch"
+        data-en="Both files must have the same format."
+        data-pl="Oba pliki muszą mieć ten sam format."></span>
+
+  <span data-key="extract_failed"
+        data-en="Failed to read document content. File may be corrupted."
+        data-pl="Nie udało się odczytać pliku. Może być uszkodzony."></span>
+
+  <span data-key="empty_documents"
+        data-en="No readable content found in documents."
+        data-pl="Nie znaleziono czytelnej treści w dokumentach."></span>
+
+  <span data-key="too_many_changes"
+        data-en="Too many changes to analyze. Try smaller documents."
+        data-pl="Za dużo zmian do analizy. Spróbuj mniejszych dokumentów."></span>
+
+  <span data-key="unsupported_type"
+        data-en="Unsupported file type."
+        data-pl="Nieobsługiwany typ pliku."></span>
+
+  <span data-key="file_too_large"
+        data-en="File is too large (max 10 MB)."
+        data-pl="Plik jest za duży (maks. 10 MB)."></span>
+
+  <span data-key="mime_invalid"
+        data-en="Invalid file MIME type."
+        data-pl="Nieprawidłowy typ MIME pliku."></span>
+</div>
+
+<script src="{% static 'docdiff/js/docdiff.js' %}" defer></script>
 {% endblock %}

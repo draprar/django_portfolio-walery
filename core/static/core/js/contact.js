@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const button = form.querySelector("button[type=submit]");
   const alertBox = document.querySelector("#contact-alerts");
 
-  // helper do wyciągania komunikatu w aktualnym języku
+  // helper
   function getMessage(id) {
     const lang = document.documentElement.lang || "en";
     const el = document.getElementById(id);

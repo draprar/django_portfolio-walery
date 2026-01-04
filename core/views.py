@@ -21,10 +21,8 @@ logger = logging.getLogger(__name__)
 def index(request):
     return render(request, "core/index.html")
 
-
 def health_check(request):
     return JsonResponse({"status": "ok"})
-
 
 class HomeView(View):
     template_name = "core/index.html"

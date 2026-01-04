@@ -1,20 +1,19 @@
 AOS.init({ once: true, duration: 700 });
 
 (function () {
-  // helpery
+  // helpers
   const setDocumentLang = (lang) => {
     document.documentElement.setAttribute('lang', lang);
   };
 
   function applyTextToElement(el, text) {
     if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-      // jeśli to placeholder/value
+      // if placeholder/value
       if ('placeholder' in el) el.placeholder = text;
       if ('value' in el && (el.type === 'button' || el.type === 'submit')) el.value = text;
       return;
     }
 
-    // elementy linków, nagłówków, paragrafów itp. — używamy innerHTML, bo atrybut może zawierać HTML
     el.innerHTML = text;
   }
 
@@ -22,27 +21,26 @@ AOS.init({ once: true, duration: 700 });
     if (!lang) return;
     setDocumentLang(lang);
 
-    // wszystkie elementy z obydwoma atrybutami
+    // all elements with both attributes
     document.querySelectorAll('[data-en][data-pl]').forEach(el => {
       const text = el.getAttribute(`data-${lang}`) || el.getAttribute('data-en') || '';
       applyTextToElement(el, text);
     });
 
-    // oznacz aktywny przycisk (wszystkie .lang-btn)
+    // all .lang-btn
     document.querySelectorAll('.lang-btn').forEach(btn => {
       const isActive = btn.dataset.lang === lang;
       btn.classList.toggle('active', isActive);
       btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
     });
 
-    // zapamiętanie wyboru
+    // save choice
     try { localStorage.setItem('site_lang', lang); } catch (e) { /* ignore */ }
   }
 
-  // podłączenie przycisków (zgodne z CSP)
+  // CSP buttons
   function bindLangButtons() {
     document.querySelectorAll('.lang-btn').forEach(btn => {
-      // usuwamy potencjalne inline onclick (na wszelki wypadek)
       btn.removeAttribute('onclick');
 
       btn.addEventListener('click', (e) => {
@@ -52,7 +50,7 @@ AOS.init({ once: true, duration: 700 });
     });
   }
 
-  // inicjalizacja: preferencje -> saved -> browser -> fallback 'en'
+  // initialization
   function init() {
     bindLangButtons();
 
@@ -76,13 +74,12 @@ AOS.init({ once: true, duration: 700 });
     });
   }
 
-  // exec when DOM ready — script is deferred but extra safety
+  // exec when DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
 
-  // expose for manual testing in console if needed
   window.switchLang = switchLang;
 })();
