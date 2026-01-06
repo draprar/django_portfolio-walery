@@ -1,14 +1,3 @@
-"""
-Generating an interactive HTML report and optional JSON.
-Includes:
- - interactive filters (type and change)
- - collapsible section for unchanged blocks
- - change scoring
- - integration with AI semantic heuristics (analyze_change)
- - TOC sorted by AI semantic score
- - Dark Mode (default: light)
-"""
-
 from typing import List, Dict, Any
 import html
 import json
@@ -244,34 +233,34 @@ def _render_ai_info(f, b: Dict[str, Any]):
     if not (labels or sem is not None or typ or conf):
         return
 
-    f.write("<div class='ai-section'><b>🧠 AI analysis:</b> ")
+    f.write("<div class='ai-section'><b>🧠 <span data-i18n='ai_summary'>AI Summary</span>:</b> ")
     if labels:
         f.write(" ".join(f"<span class='badge'>{html.escape(l)}</span>" for l in labels))
     if typ:
-        f.write(f" <span class='badge'>Type: {html.escape(typ)}</span>")
+        f.write(f"<span class='badge'><span data-i18n='type'>Type</span>: {html.escape(typ)}</span>")
     if sem is not None:
-        f.write(f" <span class='badge'>Relevance: {sem}/10</span>")
+        f.write(f" <span class='badge'><span data-i18n='relevance'>Relevance</span>: {sem}/10</span>")
     if conf is not None:
-        f.write(f" <span class='badge'>Confidence: {conf}</span>")
+        f.write(f" <span class='badge'><span data-i18n='confidence'>Confidence</span>: {conf}</span>")
     f.write("</div>")
 
 
 def _render_paragraph(f, b, cls):
     f.write(f"<div class='card {cls}'>")
     f.write("<div class='meta'>")
-    f.write("<span class='badge'>PARAGRAPH</span>")
+    f.write("<span class='badge' data-i18n='paragraph'>PARAGRAPH</span>")
     f.write("</div>")
     _render_ai_info(f, b)
 
     if b.get("change") == "changed":
         oldt = html.escape(b.get("old", {}).get("text", "") or "")
         newt = html.escape(b.get("new", {}).get("text", "") or "")
-        f.write(f"<p class='small'><b>Old:</b> {oldt}</p>")
-        f.write(f"<p class='small'><b>New:</b> {newt}</p>")
+        f.write(f"<p class='small'><b><span data-i18n='old'>Old</span>:</b> {oldt}</p>")
+        f.write(f"<p class='small'><b><span data-i18n='new'>New</span:</b> {newt}</p>")
         inline = b.get("inline_html")
         if inline:
             # inline_html already contains <del>/<ins> - insert unescaped
-            f.write(f"<div class='small'><b>Inline diff:</b><div class='pre diff'>{inline}</div></div>")
+            f.write(f"<div class='small'><b><span data-i18n='inline'>Inline diff</span>:</b><div class='pre diff'>{inline}</div></div>")
     else:
         text = html.escape(b.get("text") or b.get("old", {}).get("text") or "")
         f.write(f"<p class='small'>{text}</p>")
@@ -281,7 +270,7 @@ def _render_paragraph(f, b, cls):
 
 def _render_table(f, b, cls):
     f.write(f"<div class='card {cls}'>")
-    f.write("<div class='meta'><span class='badge'>TABLE</span></div>")
+    f.write("<div class='meta'><span class='badge' data-i18n='table'>TABLE</span></div>")
     _render_ai_info(f, b)
 
     # if we have table_changes (cell-level diffs), use them; otherwise, regular table
@@ -313,7 +302,7 @@ def _render_table(f, b, cls):
 def _render_image(f, b, cls):
     sha = b.get("sha1") or b.get("new", {}).get("sha1") or ""
     f.write(f"<div class='card {cls}'>")
-    f.write("<div class='meta'><span class='badge'>IMAGE</span></div>")
+    f.write("<div class='meta'><span class='badge' data-i18n='image'>IMAGE</span></div>")
     _render_ai_info(f, b)
     f.write(f"<p class='small'>SHA1={html.escape((sha or '')[:12])}...</p>")
     f.write("</div>")
@@ -361,85 +350,184 @@ def generate_html_report(block_diffs: List[Dict[str, Any]], output_path: str = "
 
     # 4) generate file
     with open(output_path, "w", encoding="utf-8") as f:
-        f.write("<!DOCTYPE html><html><head><meta charset='utf-8'>")
+        f.write("<!DOCTYPE html><html lang='en'><head><meta charset='utf-8'>")
         f.write(STYLE)
 
         # JS (deferred / DOMContentLoaded)
         f.write("""
-<script defer>
-function toggleClass(el, cls){ el.classList.toggle(cls); }
-function filterBy(){
-  document.querySelectorAll('[data-change]').forEach(function(n){
-    const ch = n.dataset.change;
-    const typ = n.dataset.type;
-    let show = true;
-    if(window.filterChange.length && window.filterChange.indexOf(ch) === -1) show = false;
-    if(window.filterType.length && window.filterType.indexOf(typ) === -1) show = false;
-    n.style.display = show ? '' : 'none';
-  });
-}
-function initFilters(){
-  window.filterChange = [];
-  window.filterType = [];
-  document.querySelectorAll('.chip.change').forEach(function(c){
-    c.addEventListener('click', function(){
-      toggleClass(c,'active');
-      const v = c.dataset.val;
-      if(c.classList.contains('active')) window.filterChange.push(v);
-      else window.filterChange = window.filterChange.filter(x=>x!==v);
-      filterBy();
-    });
-  });
-  document.querySelectorAll('.chip.type').forEach(function(c){
-    c.addEventListener('click', function(){
-      toggleClass(c,'active');
-      const v = c.dataset.val;
-      if(c.classList.contains('active')) window.filterType.push(v);
-      else window.filterType = window.filterType.filter(x=>x!==v);
-      filterBy();
-    });
-  });
+        <script defer>
+        function toggleClass(el, cls){ el.classList.toggle(cls); }
+        function filterBy(){
+          document.querySelectorAll('[data-change]').forEach(function(n){
+            const ch = n.dataset.change;
+            const typ = n.dataset.type;
+            let show = true;
+            if(window.filterChange.length && window.filterChange.indexOf(ch) === -1) show = false;
+            if(window.filterType.length && window.filterType.indexOf(typ) === -1) show = false;
+            n.style.display = show ? '' : 'none';
+          });
+        }
+        function initFilters(){
+          window.filterChange = [];
+          window.filterType = [];
+          document.querySelectorAll('.chip.change').forEach(function(c){
+            c.addEventListener('click', function(){
+              toggleClass(c,'active');
+              const v = c.dataset.val;
+              if(c.classList.contains('active')) window.filterChange.push(v);
+              else window.filterChange = window.filterChange.filter(x=>x!==v);
+              filterBy();
+            });
+          document.querySelectorAll(".lang-btn").forEach(btn=>{
+              btn.addEventListener("click", function(){
+                setLang(this.dataset.lang);
+              });
+            });
+          });
+          document.querySelectorAll('.chip.type').forEach(function(c){
+            c.addEventListener('click', function(){
+              toggleClass(c,'active');
+              const v = c.dataset.val;
+              if(c.classList.contains('active')) window.filterType.push(v);
+              else window.filterType = window.filterType.filter(x=>x!==v);
+              filterBy();
+            });
+          });
+        
+          var collBtn = document.querySelector('.collapse-toggle');
+          if(collBtn){
+            collBtn.addEventListener('click', function(){
+              // check if currently collapsed (all unchanged hidden)
+              var unchanged = Array.from(document.querySelectorAll('.unchanged'));
+              var anyVisible = unchanged.some(x => x.style.display !== 'none');
+              if (anyVisible) {
+                  unchanged.forEach(x => x.style.display = 'none');
+                  this.dataset.state = "hidden";
+                  this.textContent = I18N[CURRENT_LANG].show_unchanged;
+                } else {
+                  unchanged.forEach(x => x.style.display = '');
+                  this.dataset.state = "shown";
+                  this.textContent = I18N[CURRENT_LANG].hide_unchanged;
+                }
+            });
+          }
+        
+          // dark mode toggle
+          var dmBtn = document.querySelector('.dark-toggle');
+          if(dmBtn){
+            dmBtn.addEventListener('click', function(){
+              document.body.classList.toggle('dark');
+              dmBtn.textContent = document.body.classList.contains('dark')
+              ? I18N[CURRENT_LANG].mode_dark
+              : I18N[CURRENT_LANG].mode_light;
+            });
+          }
+        
+          // smooth anchor scroll for TOC links
+          document.querySelectorAll('.toc a').forEach(function(a){
+            a.addEventListener('click', function(e){
+              e.preventDefault();
+              var id = this.getAttribute('href').slice(1);
+              var el = document.getElementById(id);
+              if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
+            });
+          });
+        
+        } // end initFilters
+        
+        document.addEventListener('DOMContentLoaded', initFilters);
+        </script>
+        """)
+        f.write("""
+        <script>
+        const I18N = {
+          en: {
+            added: "added", 
+            deleted: "deleted", 
+            changed: "changed", 
+            unchanged: "unchanged",
+            paragraph: "Paragraph",
+            table: "Table",
+            image: "Image",
+            score: "Score",
+            back: "Back to DocDiff",
+            title: "Document Comparison Report",
+            total: "Total blocks",
+            ai_summary: "AI Summary",
+            toc: "Most Significant Changes (TOC)",
+            hide_unchanged: "Hide unchanged",
+            show_unchanged: "Show unchanged",
+            mode_light: "Mode: light",
+            mode_dark: "Mode: dark",
+            change: "change",
+            old: "Old",
+            new: "New",
+            inline: "Inline diff",
+            relevance: "Relevance",
+            confidence: "Confidence",
+            type: "Type"
+          },
+          pl: {
+            added: "dodane", 
+            deleted: "usunięte", 
+            changed: "zmienione", 
+            unchanged: "bez zmian",
+            paragraph: "Akapit",
+            table: "Tabela",
+            image: "Obraz",
+            score: "Wynik",
+            back: "Powrót do DocDiff",
+            title: "Raport porównania dokumentów",
+            total: "Łączna liczba bloków",
+            ai_summary: "Podsumowanie AI",
+            toc: "Najistotniejsze zmiany",
+            hide_unchanged: "Ukryj bez zmian",
+            show_unchanged: "Pokaż bez zmian",
+            mode_light: "Tryb: jasny",
+            mode_dark: "Tryb: ciemny",
+            change: "zmiana",
+            old: "Stare",
+            new: "Nowe",
+            inline: "Różnice",
+            relevance: "Istotność",
+            confidence: "Pewność",
+            type: "Typ"
+          }
+        };
 
-  var collBtn = document.querySelector('.collapse-toggle');
-  if(collBtn){
-    collBtn.addEventListener('click', function(){
-      // check if currently collapsed (all unchanged hidden)
-      var unchanged = Array.from(document.querySelectorAll('.unchanged'));
-      var anyVisible = unchanged.some(x => x.style.display !== 'none');
-      if(anyVisible){
-        unchanged.forEach(x => x.style.display = 'none');
-        this.textContent = 'Show unchanged';
-      } else {
-        unchanged.forEach(x => x.style.display = '');
-        this.textContent = 'Hide unchanged';
-      }
-    });
-  }
+        let CURRENT_LANG = "en";
 
-  // dark mode toggle
-  var dmBtn = document.querySelector('.dark-toggle');
-  if(dmBtn){
-    dmBtn.addEventListener('click', function(){
-      document.body.classList.toggle('dark');
-      dmBtn.textContent = document.body.classList.contains('dark') ? 'Mode: dark' : 'Mode: light';
-    });
-  }
-
-  // smooth anchor scroll for TOC links
-  document.querySelectorAll('.toc a').forEach(function(a){
-    a.addEventListener('click', function(e){
-      e.preventDefault();
-      var id = this.getAttribute('href').slice(1);
-      var el = document.getElementById(id);
-      if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
-    });
-  });
-
-} // end initFilters
-
-document.addEventListener('DOMContentLoaded', initFilters);
-</script>
-""")
+        function setLang(lang){
+          CURRENT_LANG = lang;
+    
+          document.querySelectorAll("[data-i18n]").forEach(el=>{
+            const key = el.dataset.i18n;
+            if(I18N[lang][key]){
+              el.textContent = I18N[lang][key];
+            }
+          });
+    
+          const dmBtn = document.querySelector(".dark-toggle");
+          if (dmBtn) {
+            dmBtn.textContent = document.body.classList.contains("dark")
+              ? I18N[lang].mode_dark
+              : I18N[lang].mode_light;
+          }
+    
+          const collapseBtn = document.querySelector(".collapse-toggle");
+            if (collapseBtn) {
+              const hidden = collapseBtn.dataset.state === "hidden";
+              collapseBtn.textContent = hidden
+                ? I18N[CURRENT_LANG].show_unchanged
+                : I18N[CURRENT_LANG].hide_unchanged;
+            }
+        }
+        
+        document.addEventListener("DOMContentLoaded", function () {
+          setLang(CURRENT_LANG);
+        });
+        </script>
+        """)
 
         # body start
         f.write("</head><body><div class='container'>")
@@ -454,8 +542,10 @@ document.addEventListener('DOMContentLoaded', initFilters);
           </div>
         </div>
         """)
-        f.write("<div class='header'><div><h1>Document Comparison Report</h1>")
-        f.write(f"<div class='small'>Total blocks: {len(block_diffs)}</div></div>")
+        f.write("<div class='header'><div>")
+        f.write("<h1 data-i18n='title'>Document Comparison Report</h1>")
+        f.write(f"<div class='small'><span data-i18n='total'>Total blocks</span>: {len(block_diffs)}</div>")
+        f.write("</div>")
 
         # right side header: dark mode button
         f.write("<div style='display:flex;align-items:center;gap:8px;'>")
@@ -463,18 +553,26 @@ document.addEventListener('DOMContentLoaded', initFilters);
         f.write("</div></div>")  # header end
 
         # AI summary card
-        f.write(f"<div class='card'><b>AI Summary:</b><div class='small'>{summary_html}</div></div>")
+        f.write(f"""
+        <div class='card'>
+          <b data-i18n="ai_summary">AI Summary</b>:
+          <div class='small'>{summary_html}</div>
+        </div>
+        """)
 
         # controls (chips)
         f.write("<div class='controls card'>")
         for ch in ("added", "deleted", "changed", "unchanged"):
-            f.write(f"<span class='chip change' data-val='{ch}'>{ch}</span>")
+            f.write(f"<span class='chip change' data-val='{ch}' data-i18n='{ch}'>{ch}</span>")
         for t in stats["by_type"]:
-            f.write(f"<span class='chip type' data-val='{html.escape(t)}'>{html.escape(t)}</span>")
+            f.write(f"<span class='chip type' data-val='{html.escape(t)}' data-i18n='{html.escape(t)}'>{html.escape(t)}</span>")
         f.write("</div>")
 
         # TOC sorted by AI score
-        f.write("<div class='toc card'><b>Most Significant Changes (TOC):</b> ")
+        f.write("""
+        <div class='toc card'>
+          <b data-i18n="toc">Most Significant Changes (TOC)</b>:
+        """)
         for i in toc_items[:200]:
             b = block_diffs[i]
             name = html.escape(str(b.get("type") or "blk"))
@@ -485,7 +583,7 @@ document.addEventListener('DOMContentLoaded', initFilters);
         f.write("</div>")
 
         # collapse toggle
-        f.write("<div style='margin-bottom:10px;'><button class='collapse-toggle chip'>Hide unchanged</button></div>")
+        f.write("<div style='margin-bottom:10px;'><button class='collapse-toggle chip' data-i18n='hide_unchanged'>Hide unchanged</button></div>")
 
         # render blocks
         for i, b in enumerate(block_diffs):
@@ -497,7 +595,7 @@ document.addEventListener('DOMContentLoaded', initFilters);
             # wrapper with attributes
             f.write(f"<div id='blk{i}' class='card {html.escape(ch)}' data-change='{html.escape(ch)}' data-type='{html.escape(typ)}'>")
             f.write("<div class='meta'>")
-            f.write(f"<span class='badge'>{html.escape(typ).upper()}</span>")
+            f.write(f"<span class='badge' data-i18n='{html.escape(typ)}>{html.escape(typ).upper()}</span>")
             f.write(f"<span class='small'>change: {html.escape(str(b.get('change','')))}</span>")
             f.write(f"<span class='score {score_cls}'>s={score}</span>")
             f.write("</div>")  # meta end
