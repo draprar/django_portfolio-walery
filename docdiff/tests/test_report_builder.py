@@ -67,9 +67,9 @@ def test_render_ai_info_full(monkeypatch):
     }
     rb._render_ai_info(f, block)
     html = f.getvalue()
-    assert "AI analysis" in html
+    assert "AI Summary" in html
     assert "person" in html
-    assert "Type:" in html
+    assert "type</span>:" in html.lower()
     assert "Relevance" in html
     assert "Confidence" in html
 
@@ -86,8 +86,8 @@ def test_render_paragraph_changed_and_unchanged():
     rb._render_paragraph(f1, changed, "changed")
     html1 = f1.getvalue()
     assert "Inline diff" in html1
-    assert "Old:" in html1
-    assert "New:" in html1
+    assert "<del>" in html1.lower()
+    assert "<ins>" in html1.lower()
 
     unchanged = {"change": "unchanged", "text": "no diff"}
     f2 = io.StringIO()
@@ -142,7 +142,7 @@ def test_generate_html_report_success(mock_summary, mock_analyze, tmp_path):
     out = tmp_path / "report.html"
     rb.generate_html_report(blocks, output_path=str(out))
     html = out.read_text(encoding="utf-8")
-    assert "<html>" in html
+    assert "<html" in html
     assert "AI Summary" in html
     assert "Document Comparison Report" in html
     assert "Mode: light" in html

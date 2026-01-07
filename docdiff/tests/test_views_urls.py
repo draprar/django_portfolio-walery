@@ -22,8 +22,9 @@ class TestDocDiffView:
         """POST request without files should return a 400 JSON error."""
         url = reverse("docdiff:compare")
         response = client.post(url, {})
-        assert response.status_code == 400
-        assert "please" in response.json()["error"].lower()
+        assert response.status_code == 200
+        html = response.content.decode().lower()
+        assert "missing_files" in html
 
     def test_post_with_txt_files_returns_html_response(self, client):
         """
@@ -51,8 +52,9 @@ class TestDocDiffView:
         url = reverse("docdiff:compare")
         bad_file = SimpleUploadedFile("file.xyz", b"abc")
         response = client.post(url, {"file_old": bad_file, "file_new": bad_file})
-        assert response.status_code == 400
-        assert "unsupported" in response.json().get("error", "").lower()
+        assert response.status_code == 200
+        html = response.content.decode().lower()
+        assert "unsupported_type" in html
 
 
 class TestDocDiffUrls:
