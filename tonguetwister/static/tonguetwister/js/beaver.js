@@ -12,12 +12,18 @@ document.addEventListener('DOMContentLoaded', () => {
         let currentStep = 0; // Track current tutorial step
 
         beaverImg.onload = () => {
-            speechBubble.style.display = 'block'; // Show speech bubble after image loads
-        };
+            // Resize after load so offsetWidth is real on mobile
+            beaverImg.style.width = `${beaverImg.offsetWidth * 1.2}px`;
+            beaverImg.style.height = `${beaverImg.offsetHeight * 1.2}px`;
 
-        // Resize beaver image
-        beaverImg.style.width = `${beaverImg.offsetWidth * 1.2}px`;
-        beaverImg.style.height = `${beaverImg.offsetHeight * 1.2}px`;
+            // Position after resize
+            const vw = window.innerWidth;
+            beaverImg.style.left = `${vw / 4 - beaverImg.offsetWidth / 2}px`;
+            beaverImg.style.top = `${window.innerHeight / 1.5 - beaverImg.offsetHeight / 2}px`;
+
+            updateSpeechBubblePosition();
+            speechBubble.style.display = 'block';
+        };
 
         // Dim the screen for focus
         screenDim.style.display = 'block';
@@ -203,11 +209,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('beaver-no').addEventListener('click', closeTutorialAndShowPolishBeaver);
         closeBubble.addEventListener('click', closeTutorialAndShowPolishBeaver);
 
-        // Initial positioning
-        const viewportWidth = window.innerWidth;
-        beaverImg.style.left = `${viewportWidth / 4 - beaverImg.offsetWidth / 2}px`;
-        beaverImg.style.top = `${window.innerHeight / 1.5 - beaverImg.offsetHeight / 2}px`;
-
         updateSpeechBubblePosition();
     } else {
         showPolishBeaver();
@@ -247,9 +248,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // If not initialized, enlarge beaver image and randomize its position
         if (!showPolishBeaver.initialized) {
-            polishBeaverImg.style.width = (polishBeaverImg.offsetWidth * 1.2) + 'px';
-            polishBeaverImg.style.height = (polishBeaverImg.offsetHeight * 1.2) + 'px';
-            randomizePosition();
+            if (polishBeaverImg.complete) {
+                polishBeaverImg.style.width = (polishBeaverImg.offsetWidth * 1.2) + 'px';
+                polishBeaverImg.style.height = (polishBeaverImg.offsetHeight * 1.2) + 'px';
+                randomizePosition();
+            } else {
+                polishBeaverImg.onload = () => {
+                    polishBeaverImg.style.width = (polishBeaverImg.offsetWidth * 1.2) + 'px';
+                    polishBeaverImg.style.height = (polishBeaverImg.offsetHeight * 1.2) + 'px';
+                    randomizePosition();
+                };
+            }
             showPolishBeaver.initialized = true;
         }
 

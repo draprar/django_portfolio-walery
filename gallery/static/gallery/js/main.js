@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 entry.target.classList.add("visible");
             }
         });
-    }, { threshold: 0.3 });
+    }, { threshold: 0.1, rootMargin: "0px 0px -30px 0px" });
 
     fadeInElements.forEach(element => observer.observe(element));
 });
