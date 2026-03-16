@@ -1,5 +1,8 @@
-const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
-const sections = Array.from(navLinks).map(link => document.querySelector(link.getAttribute('href')));
+const navLinks = document.querySelectorAll('.nav-link[href^="/#"], .nav-link[href^="#"]');
+const sections = Array.from(navLinks).map(link => {
+  const href = link.getAttribute('href').replace(/^\/?/, '');
+  return document.querySelector(href.startsWith('#') ? href : `#${href.split('#')[1]}`);
+});
 
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {

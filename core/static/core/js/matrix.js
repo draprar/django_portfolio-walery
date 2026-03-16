@@ -135,7 +135,7 @@
     }
 
     // Toggle on click
-    document.addEventListener("click", () => {
+    document.querySelector(".split-section")?.addEventListener("click", () => {
       matrixEnabled = !matrixEnabled;
       glitchEnabled = !matrixEnabled;
 
