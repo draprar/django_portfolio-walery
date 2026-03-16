@@ -9,5 +9,4 @@ document.addEventListener("DOMContentLoaded", () => {
             display: ["zoom", "fullscreen", "close"],
         },
     });
-    console.log("✅ Fancybox initialized successfully!");
 });

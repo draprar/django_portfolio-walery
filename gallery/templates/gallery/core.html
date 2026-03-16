@@ -19,9 +19,6 @@
     <!-- Fancybox CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" />
 
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="{% static 'gallery/img/favicon.ico' %}">
-
 </head>
 <body>
 
@@ -75,7 +72,7 @@
 
     <!-- Footer -->
     <footer class="footer text-center">
-        <p>© 2025 Walery — All rights reserved</p>
+        <p>© {% now "Y" %} Walery — All rights reserved</p>
     </footer>
 
     <!-- Scripts -->
