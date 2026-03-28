@@ -1,5 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     const userAuthenticated = document.body.getAttribute('data-user-authenticated') === 'true';
+    const BUBBLE_GAP = 20;
+    const SAFE_MARGIN = 8;
+    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+    const fitBubbleToViewport = (bubbleElement) => {
+        const maxBubbleWidth = Math.max(180, window.innerWidth - (SAFE_MARGIN * 2));
+        bubbleElement.style.maxWidth = `${maxBubbleWidth}px`;
+    };
 
     if (!userAuthenticated) {
         // Get elements for beaver tutorial
@@ -11,12 +19,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const beaverOptions = document.createElement('div'); // Create options div for buttons
         let currentStep = 0; // Track current tutorial step
 
-        beaverImg.onload = () => {
-            // Resize after load so offsetWidth is real on mobile
-            beaverImg.style.width = `${beaverImg.offsetWidth * 1.2}px`;
-            beaverImg.style.height = `${beaverImg.offsetHeight * 1.2}px`;
+        let tutorialBeaverSized = false;
 
-            // Position after resize
+        const initializeTutorialBeaver = () => {
+            // Handle cached image and avoid repeated 1.2x scaling.
+            if (!tutorialBeaverSized) {
+                beaverImg.style.width = `${beaverImg.offsetWidth * 1.2}px`;
+                beaverImg.style.height = `${beaverImg.offsetHeight * 1.2}px`;
+                tutorialBeaverSized = true;
+            }
+
             const vw = window.innerWidth;
             beaverImg.style.left = `${vw / 4 - beaverImg.offsetWidth / 2}px`;
             beaverImg.style.top = `${window.innerHeight / 1.5 - beaverImg.offsetHeight / 2}px`;
@@ -164,10 +176,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update the speech bubble position relative to the beaver image
         const updateSpeechBubblePosition = () => {
+            fitBubbleToViewport(speechBubble);
+
+            const bubbleWidth = speechBubble.offsetWidth;
+            const bubbleHeight = speechBubble.offsetHeight;
+            const beaverHeight = beaverImg.offsetHeight;
+
+            // Keep enough vertical room so bubble always stays above the beaver.
+            const maxTop = Math.max(SAFE_MARGIN, window.innerHeight - beaverHeight - SAFE_MARGIN);
+            const requiredTop = Math.min(bubbleHeight + BUBBLE_GAP + SAFE_MARGIN, maxTop);
+            const currentTop = parseFloat(beaverImg.style.top) || beaverImg.getBoundingClientRect().top;
+            if (currentTop < requiredTop) {
+                beaverImg.style.top = `${requiredTop}px`;
+            }
+
             const beaverRect = beaverImg.getBoundingClientRect();
-            speechBubble.style.left = `${beaverRect.right + 20}px`;
-            speechBubble.style.top = `${beaverRect.top - speechBubble.offsetHeight - 20}px`;
+            const desiredLeft = beaverRect.right + BUBBLE_GAP;
+            const maxLeft = Math.max(SAFE_MARGIN, window.innerWidth - bubbleWidth - SAFE_MARGIN);
+
+            speechBubble.style.left = `${clamp(desiredLeft, SAFE_MARGIN, maxLeft)}px`;
+            speechBubble.style.top = `${beaverRect.top - bubbleHeight - BUBBLE_GAP}px`;
         };
+
+        // Run image init only after helpers are initialized (avoid TDZ crash on cached images).
+        if (beaverImg.complete) {
+            initializeTutorialBeaver();
+        } else {
+            beaverImg.onload = initializeTutorialBeaver;
+        }
 
         // Drag functionality for beaver image
         let isDragging = false, startX, startY, offsetX, offsetY;
@@ -187,8 +223,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isDragging) {
                 const x = (e.clientX || e.touches[0].clientX) - offsetX;
                 const y = (e.clientY || e.touches[0].clientY) - offsetY;
-                beaverImg.style.left = `${x}px`; // Update image X position
-                beaverImg.style.top = `${y}px`; // Update image Y position
+
+                const minX = SAFE_MARGIN;
+                const maxX = Math.max(minX, window.innerWidth - beaverImg.offsetWidth - SAFE_MARGIN);
+                const desiredMinY = speechBubble.offsetHeight + BUBBLE_GAP + SAFE_MARGIN;
+                const viewportMaxY = window.innerHeight - beaverImg.offsetHeight - SAFE_MARGIN;
+                const maxY = Math.max(SAFE_MARGIN, viewportMaxY);
+                const minY = Math.min(desiredMinY, maxY);
+
+                beaverImg.style.left = `${clamp(x, minX, maxX)}px`; // Update image X position
+                beaverImg.style.top = `${clamp(y, minY, maxY)}px`; // Keep room for bubble above
                 updateSpeechBubblePosition(); // Update speech bubble position
             }
         };
@@ -208,6 +252,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('beaver-yes').addEventListener('click', startTutorial);
         document.getElementById('beaver-no').addEventListener('click', closeTutorialAndShowPolishBeaver);
         closeBubble.addEventListener('click', closeTutorialAndShowPolishBeaver);
+
+        window.addEventListener('resize', updateSpeechBubblePosition);
+        window.addEventListener('orientationchange', updateSpeechBubblePosition);
 
         updateSpeechBubblePosition();
     } else {
@@ -264,17 +311,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Function to randomize position of the Polish Beaver
         function randomizePosition() {
+            fitBubbleToViewport(polishSpeechBubble);
+
             const viewportWidth = window.innerWidth;
             const viewportHeight = window.innerHeight;
             const imgWidth = polishBeaverImg.offsetWidth;
             const imgHeight = polishBeaverImg.offsetHeight;
+            const bubbleHeight = polishSpeechBubble.offsetHeight;
 
             const marginWidth = 0.1 * viewportWidth;
             const marginHeight = 0.1 * viewportHeight;
 
             // Randomly position the image within margins
-            const randomLeft = marginWidth + Math.random() * (viewportWidth - imgWidth - 2 * marginWidth);
-            const randomTop = marginHeight + Math.random() * (viewportHeight - imgHeight - 2 * marginHeight);
+            const minLeft = marginWidth;
+            const maxLeft = Math.max(minLeft, viewportWidth - imgWidth - marginWidth);
+            const desiredMinTop = Math.max(marginHeight, bubbleHeight + BUBBLE_GAP + SAFE_MARGIN);
+            const viewportMaxTop = viewportHeight - imgHeight - marginHeight;
+            const maxTop = Math.max(SAFE_MARGIN, viewportMaxTop);
+            const minTop = Math.min(desiredMinTop, maxTop);
+
+            const randomLeft = minLeft + Math.random() * (maxLeft - minLeft);
+            const randomTop = minTop + Math.random() * (maxTop - minTop);
 
             polishBeaverImg.style.left = randomLeft + 'px';
             polishBeaverImg.style.top = randomTop + 'px';
@@ -284,9 +341,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update speech bubble position relative to the beaver
         function updatePolishSpeechBubblePosition() {
+            fitBubbleToViewport(polishSpeechBubble);
+
+            var bubbleWidth = polishSpeechBubble.offsetWidth;
+            var bubbleHeight = polishSpeechBubble.offsetHeight;
+            var beaverHeight = polishBeaverImg.offsetHeight;
+
+            // Keep enough vertical room so bubble always stays above the beaver.
+            var maxTop = Math.max(SAFE_MARGIN, window.innerHeight - beaverHeight - SAFE_MARGIN);
+            var requiredTop = Math.min(bubbleHeight + BUBBLE_GAP + SAFE_MARGIN, maxTop);
+            var currentTop = parseFloat(polishBeaverImg.style.top) || polishBeaverImg.getBoundingClientRect().top;
+            if (currentTop < requiredTop) {
+                polishBeaverImg.style.top = requiredTop + 'px';
+            }
+
             var polishBeaverRect = polishBeaverImg.getBoundingClientRect();
-            polishSpeechBubble.style.left = polishBeaverRect.right + 'px';
-            polishSpeechBubble.style.top = (polishBeaverRect.top - polishSpeechBubble.offsetHeight - 20) + 'px';
+            var desiredLeft = polishBeaverRect.right + BUBBLE_GAP;
+            var maxLeft = Math.max(SAFE_MARGIN, window.innerWidth - bubbleWidth - SAFE_MARGIN);
+
+            polishSpeechBubble.style.left = clamp(desiredLeft, SAFE_MARGIN, maxLeft) + 'px';
+            polishSpeechBubble.style.top = (polishBeaverRect.top - bubbleHeight - BUBBLE_GAP) + 'px';
         }
 
         // Fetch new Old Polish record and display it in the speech bubble
@@ -325,8 +399,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isDragging) {
                 var x = (e.clientX || e.touches[0].clientX) - offsetX;
                 var y = (e.clientY || e.touches[0].clientY) - offsetY;
-                polishBeaverImg.style.left = x + 'px';
-                polishBeaverImg.style.top = y + 'px';
+
+                var minX = SAFE_MARGIN;
+                var maxX = Math.max(minX, window.innerWidth - polishBeaverImg.offsetWidth - SAFE_MARGIN);
+                var desiredMinY = polishSpeechBubble.offsetHeight + BUBBLE_GAP + SAFE_MARGIN;
+                var viewportMaxY = window.innerHeight - polishBeaverImg.offsetHeight - SAFE_MARGIN;
+                var maxY = Math.max(SAFE_MARGIN, viewportMaxY);
+                var minY = Math.min(desiredMinY, maxY);
+
+                polishBeaverImg.style.left = clamp(x, minX, maxX) + 'px';
+                polishBeaverImg.style.top = clamp(y, minY, maxY) + 'px';
                 moved = true; // Mark that the beaver was moved
                 updatePolishSpeechBubblePosition(); // Adjust speech bubble position
             }
@@ -364,5 +446,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 bubbleClosedManually = false;  // Reset manual close flag
             }
         });
+
+        if (typeof showPolishBeaver.viewportHandler === 'function') {
+            window.removeEventListener('resize', showPolishBeaver.viewportHandler);
+            window.removeEventListener('orientationchange', showPolishBeaver.viewportHandler);
+        }
+
+        showPolishBeaver.viewportHandler = function () {
+            updatePolishSpeechBubblePosition();
+        };
+
+        window.addEventListener('resize', showPolishBeaver.viewportHandler);
+        window.addEventListener('orientationchange', showPolishBeaver.viewportHandler);
     }
 });
