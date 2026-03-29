@@ -2,159 +2,49 @@ name: Django CI
 
 on:
   push:
-    branches:
-      - main
   pull_request:
-    branches:
-      - main
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_db
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d test_db"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      redis:
-        image: redis:7
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    env:
+      CI: "true"
+      DJANGO_SETTINGS_MODULE: config.settings
+      DJANGO_SECRET_KEY: ci-secret-key
+      DJANGO_DEBUG: "true"
+      SENTRY_DSN: ""
+      CORS_ALLOWED_ORIGINS: http://localhost,http://127.0.0.1
+      DJANGO_ALLOWED_HOSTS: 127.0.0.1,localhost
+      DJANGO_CSRF_TRUSTED_ORIGINS: http://localhost,http://127.0.0.1
+      AWS_ACCESS_KEY_ID: dummy
+      AWS_SECRET_ACCESS_KEY: dummy
+      AWS_STORAGE_BUCKET_NAME: dummy-bucket
+      SUPABASE_PROJECT_REF: dummy-project
+      BREVO_API_KEY: ""
+      EMAIL_HOST: ""
+      EMAIL_PORT: "587"
+      EMAIL_USE_TLS: "true"
+      EMAIL_HOST_USER: ""
+      EMAIL_HOST_PASSWORD: ""
+      DEFAULT_FROM_EMAIL: test@example.com
 
     steps:
-      - name: Check out the repository
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.11"
+          cache: pip
 
-      - name: Install dependencies (skip pywin32)
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          grep -a -v 'pywin32' requirements.txt | pip install -r /dev/stdin
-          pip install redis django-redis
+          pip install -r requirements.txt
 
-      - name: Show installed packages
-        run: pip list
+      - name: Verify migrations are committed
+        run: python manage.py makemigrations --check --dry-run
 
-      - name: Set up environment variables (use Redis)
-        run: |
-          echo "DJANGO_DEBUG=True" >> .env
-          echo "DJANGO_SECRET_KEY=test-secret-for-ci" >> .env
-          echo "SECRET_KEY=test-secret-for-ci" >> .env
-          # Use SQLite for DB in tests
-          echo "SENTRY_DSN=" >> .env
-          echo "REDIS_URL=redis://redis:6379/0" >> .env
-          echo "CORS_ALLOWED_ORIGINS=http://localhost,http://127.0.0.1" >> .env
-          echo "DJANGO_ALLOWED_HOSTS=127.0.0.1,localhost" >> .env
-          echo "DJANGO_CSRF_TRUSTED_ORIGINS=http://localhost,http://127.0.0.1" >> .env
-
-          # Supabase / AWS dummy values for CI
-          echo "AWS_ACCESS_KEY_ID=dummy" >> .env
-          echo "AWS_SECRET_ACCESS_KEY=dummy" >> .env
-          echo "AWS_STORAGE_BUCKET_NAME=dummy" >> .env
-          echo "AWS_S3_REGION_NAME=eu-central-1" >> .env
-          echo "SUPABASE_PROJECT_REF=dummyref" >> .env
-
-          # Email (can be empty for CI)
-          echo "BREVO_API_KEY=" >> .env
-          echo "EMAIL_HOST=" >> .env
-          echo "EMAIL_PORT=587" >> .env
-          echo "EMAIL_USE_TLS=True" >> .env
-          echo "EMAIL_HOST_USER=" >> .env
-          echo "EMAIL_HOST_PASSWORD=" >> .env
-          echo "DEFAULT_FROM_EMAIL=test@example.com" >> .env
-          echo "CI=true" >> .env
-
-      - name: Wait for Redis to be ready
-        run: |
-          echo "Waiting for Redis..."
-          for i in {1..10}; do
-          (echo PING | nc -w 1 redis 6379 | grep PONG) && break
-          sleep 2
-          done  
-
-      - name: Show .env (debug)
-        run: |
-          echo "---- .env ----"
-          cat .env || true
-          echo "---------------"
-
-      - name: Clean pyc, __pycache__ and sqlite files
-        run: |
-          find . -type d -name "__pycache__" -exec rm -rf {} + || true
-          find . -name "*.pyc" -delete || true
-          rm -f db.sqlite3 test_db.sqlite3 || true
-          find . -name "*.sqlite3" -exec rm -f {} + || true
-
-      - name: Show DB backend detection (Django debug)
-        env:
-          DJANGO_SETTINGS_MODULE: config.settings
-        run: |
-          python - <<'PY'
-          import os
-          os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
-          import django
-          django.setup()
-          from django.conf import settings
-          print("Using DATABASES:", settings.DATABASES.get("default"))
-          PY
-
-      - name: Show cache backend (Django debug)
-        env:
-          DJANGO_SETTINGS_MODULE: config.settings
-        run: |
-          python - <<'PY'
-          import os, django
-          os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
-          django.setup()
-          from django.conf import settings
-          print("Using CACHES:", settings.CACHES.get("default"))
-          PY
-
-      - name: Prepare database and migrations
-        run: |
-          find . -path "*/migrations/*.pyc" -delete || true
-          find . -type d -name "__pycache__" -exec rm -rf {} + || true
-          python manage.py makemigrations --noinput
-          python manage.py migrate --noinput
-
-      - name: Collect static files
-        run: python manage.py collectstatic --noinput
-
-      - name: Clean caches again just in case
-        run: |
-          find . -type d -name "__pycache__" -exec rm -rf {} + || true
-          find . -name "*.pyc" -delete || true
-
-      - name: Run tests with pytest
-        env:
-          REDIS_URL: redis://localhost:6379/0
-        run: |
-          mkdir -p ./test-reports
-          pytest -k "not test_upload_image_view_post" --disable-warnings --junitxml=./test-reports/results.xml
-
-      - name: Store test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: pytest-results
-          path: ./test-reports/results.xml
+      - name: Run tests
+        run: python -m pytest -q

@@ -63,8 +63,6 @@ jsonschema-specifications==2024.10.1
 jupyter_client==8.6.3
 jupyter_core==5.8.1
 jupyterlab_pygments==0.3.0
-django-cors-headers
-drf-spectacular
 langcodes==3.5.0
 language_data==1.3.0
 license-expression==30.4.4

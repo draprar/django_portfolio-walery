@@ -32,6 +32,10 @@ ENV/
 # === DJANGO PROJECT FILES ===
 # Media & user uploads (store elsewhere in prod!)
 media/
+staticfiles/
+
+# Local debug artifacts
+debug/*.txt
 
 # === SYSTEM ===
 *~
