@@ -195,10 +195,10 @@ else:
         }
     }
 
-# --- Force SQLite + LocMemCache for pytest, Django test runner, or CI ---
-# Must be placed AFTER the REDIS_URL block so it always wins.
-# Also disables django-ratelimit (LocMemCache is not shared; triggers E003 in system check).
-_testing = any(arg in sys.argv for arg in ["test", "pytest"]) or bool(os.environ.get("CI"))
+# --- Force SQLite + LocMemCache for pytest or explicit test mode ---
+# Keep this independent from generic CI env vars so production builds
+# (e.g. Render build stage) don't accidentally use test static storage.
+_testing = any(arg in sys.argv for arg in ["test", "pytest"]) or env.bool("DJANGO_TESTING", default=False)
 if _testing:
     DATABASES = {
         "default": {
@@ -251,7 +251,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 # STATICFILES_DIRS = [BASE_DIR / 'core/static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
