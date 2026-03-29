@@ -106,6 +106,29 @@ def test_homeview_get_uses_render_and_projects(monkeypatch):
     assert "projects" in resp.context_data
 
 
+def test_homeview_get_handles_database_error(monkeypatch):
+    import core.views as views_mod
+
+    from django.db import DatabaseError
+
+    monkeypatch.setattr(
+        "core.views.Project",
+        Mock(objects=Mock(all=Mock(side_effect=DatabaseError("db down"))))
+    )
+
+    def fake_render(request, template_name, context):
+        fake_response = Mock()
+        fake_response.status_code = 200
+        fake_response.context_data = context
+        return fake_response
+
+    monkeypatch.setattr("core.views.render", fake_render)
+
+    resp = views_mod.HomeView().get(Mock())
+    assert resp.status_code == 200
+    assert resp.context_data["projects"] == []
+
+
 def test_contactview_post_success_and_error_paths(monkeypatch):
     """Test success, email failure, and invalid form paths in ContactView.post."""
     import core.views as views_mod

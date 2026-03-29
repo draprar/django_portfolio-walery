@@ -255,6 +255,7 @@ STATIC_URL = 'static/'
 # STATICFILES_DIRS = [BASE_DIR / 'core/static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+WHITENOISE_MANIFEST_STRICT = False
 
 # --- Supabase (S3-compatible) via django-storages ---
 AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
@@ -386,6 +387,9 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
         "file": {
             "level": "WARNING",
             "class": "logging.FileHandler",
@@ -394,9 +398,14 @@ LOGGING = {
     },
     "loggers": {
         "django": {
-            "handlers": ["file"],
+            "handlers": ["console", "file"],
             "level": "WARNING",
             "propagate": True,
+        },
+        "django.request": {
+            "handlers": ["console", "file"],
+            "level": "ERROR",
+            "propagate": False,
         },
     },
 }

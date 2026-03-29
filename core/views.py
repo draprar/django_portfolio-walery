@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.db import DatabaseError
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views import View
@@ -25,7 +26,12 @@ class HomeView(View):
 
     def get(self, request):
         form = ContactForm()
-        projects = Project.objects.all()
+        # Keep homepage available even if DB is temporarily unavailable.
+        try:
+            projects = list(Project.objects.all())
+        except DatabaseError:
+            logger.exception("Failed to load projects for home page")
+            projects = []
         return render(request, self.template_name, {"form": form, "projects": projects})
 
 
