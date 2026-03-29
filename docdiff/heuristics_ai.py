@@ -21,6 +21,9 @@ _NLP = None
 _NP = None
 _KMEANS = None
 
+# Module-level alias – allows monkeypatching in tests
+KMeans = None
+
 
 def get_numpy():
     global _NP
@@ -210,8 +213,8 @@ def cluster_changes(blocks: List[Dict[str, Any]]) -> Dict[int, List[int]]:
 
     nlp = get_nlp()
     np = get_numpy()
-    KMeans = get_kmeans()
-    if not nlp or not np or not KMeans:
+    _KMeans = KMeans if KMeans is not None else get_kmeans()
+    if not nlp or not np or not _KMeans:
         return {}
 
     vectors = []
@@ -234,7 +237,7 @@ def cluster_changes(blocks: List[Dict[str, Any]]) -> Dict[int, List[int]]:
 
     X = np.vstack(vectors)
     n_clusters = max(2, min(10, len(vectors) // 5))
-    kmeans = KMeans(n_clusters=n_clusters, random_state=0, n_init="auto").fit(X)
+    kmeans = _KMeans(n_clusters=n_clusters, random_state=0, n_init="auto").fit(X)
 
     clusters: Dict[int, List[int]] = {}
     for vec_idx, lbl in enumerate(kmeans.labels_):
