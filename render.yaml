@@ -8,8 +8,8 @@ services:
       pip install --upgrade pip
       pip install -r requirements.txt
       python manage.py migrate --noinput
-      python manage.py collectstatic --noinput
-    startCommand: gunicorn config.wsgi:application --workers 1 --log-file -
+      python manage.py collectstatic --noinput --clear
+    startCommand: gunicorn config.wsgi:application --workers 1 --timeout 120 --graceful-timeout 30 --keep-alive 5 --log-file -
     envVars:
       - key: DJANGO_DEBUG
         value: "False"

@@ -3,7 +3,6 @@ import random
 import re
 import string
 import sentry_sdk
-import spacy
 import requests
 import wikipedia
 from django.core.cache import cache
@@ -30,6 +29,7 @@ class Chatbot:
     def nlp(self):
         """Lazy load spaCy model on first access."""
         if self._nlp is None:
+            import spacy
             self._nlp = spacy.load("pl_core_news_sm")
         return self._nlp
 
@@ -147,4 +147,3 @@ class Chatbot:
             sentry_sdk.capture_exception(e) # logging to Sentry
             return "Wystąpił błąd, spróbuj ponownie później."
 
-chatbot_instance = Chatbot()

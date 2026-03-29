@@ -9,24 +9,48 @@ Block analysis using spaCy (pl_core_news_sm):
  - generates a summary of changes (AI summary)
 """
 
-import spacy
 import re
 from difflib import SequenceMatcher
 from typing import Dict, Any, List
-from sklearn.cluster import KMeans
-import numpy as np
 
 # ---------------------------------------------------------------------
 # spaCy loader (singleton)
 # ---------------------------------------------------------------------
 
 _NLP = None
+_NP = None
+_KMEANS = None
+
+
+def get_numpy():
+    global _NP
+    if _NP is None:
+        try:
+            import numpy as np
+            _NP = np
+        except Exception as e:
+            print(f"[WARN] NumPy failed to load: {e}")
+            _NP = False
+    return _NP if _NP is not False else None
+
+
+def get_kmeans():
+    global _KMEANS
+    if _KMEANS is None:
+        try:
+            from sklearn.cluster import KMeans
+            _KMEANS = KMeans
+        except Exception as e:
+            print(f"[WARN] scikit-learn failed to load: {e}")
+            _KMEANS = False
+    return _KMEANS if _KMEANS is not False else None
 
 
 def get_nlp():
     global _NLP
     if _NLP is None:
         try:
+            import spacy
             _NLP = spacy.load("pl_core_news_sm")
         except Exception as e:
             print(f"[WARN] spaCy model failed to load: {e}")
@@ -185,7 +209,9 @@ def cluster_changes(blocks: List[Dict[str, Any]]) -> Dict[int, List[int]]:
         return {}
 
     nlp = get_nlp()
-    if not nlp:
+    np = get_numpy()
+    KMeans = get_kmeans()
+    if not nlp or not np or not KMeans:
         return {}
 
     vectors = []
