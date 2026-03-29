@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CI: "true"
+      DJANGO_TESTING: "true"
       DJANGO_SETTINGS_MODULE: config.settings
       DJANGO_SECRET_KEY: ci-secret-key
       DJANGO_DEBUG: "true"
