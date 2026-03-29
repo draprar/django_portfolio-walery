@@ -1,7 +1,7 @@
 import logging
 
 from django.conf import settings
-from django.http import JsonResponse, HttpResponseNotAllowed
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.views import View
 from django.utils.decorators import method_decorator
@@ -9,7 +9,6 @@ from django.utils.html import escape
 
 from django_ratelimit.decorators import ratelimit
 
-from analytics.utils import count_visit
 from .forms import ContactForm
 from .models import Project
 from .email import send_brevo_email
@@ -17,9 +16,6 @@ from .email import send_brevo_email
 logger = logging.getLogger(__name__)
 
 
-@count_visit
-def index(request):
-    return render(request, "core/index.html")
 
 def health_check(request):
     return JsonResponse({"status": "ok"})
@@ -38,10 +34,13 @@ class ContactView(View):
     """
     Secure contact endpoint:
     - rate-limited (5 requests/min per IP) via django-ratelimit
+    - only POST accepted (GET/others → 405 via http_method_names)
     - rejects non-AJAX requests (X-Requested-With)
     - simple honeypot check for hidden 'website' field
     - does not log PII or message body
     """
+
+    http_method_names = ["post"]
 
     def post(self, request, *args, **kwargs):
         # Basic XHR check (case-insensitive)
@@ -53,16 +52,17 @@ class ContactView(View):
         # Honeypot: invisible field that bots often fill
         if request.POST.get("website"):
             logger.warning("Honeypot triggered from %s", request.META.get("REMOTE_ADDR"))
-            # return a generic success-looking response to reduce bot feedback
+            # Return a generic validation error without exposing details.
             return JsonResponse({"success": False, "message": "Invalid form data."}, status=400)
 
         form = ContactForm(request.POST)
+        is_valid = form.is_valid()
 
         # Log only IP and validation result. Do NOT log form data or message content.
         logger.debug("Contact form submitted from %s. Valid: %s",
-                     request.META.get("REMOTE_ADDR"), form.is_valid())
+                     request.META.get("REMOTE_ADDR"), is_valid)
 
-        if not form.is_valid():
+        if not is_valid:
             errors = {field: list(errs) for field, errs in form.errors.items()}
             logger.warning("Invalid contact form from %s. Errors: %s",
                            request.META.get("REMOTE_ADDR"), errors)
@@ -117,5 +117,3 @@ class ContactView(View):
                 "message": "An error occurred while sending the email. Please try again later."
             }, status=500)
 
-    def get(self, request, *args, **kwargs):
-        return HttpResponseNotAllowed(permitted_methods=["POST"])
