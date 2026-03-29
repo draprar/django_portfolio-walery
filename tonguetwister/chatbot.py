@@ -147,3 +147,6 @@ class Chatbot:
             sentry_sdk.capture_exception(e) # logging to Sentry
             return "Wystąpił błąd, spróbuj ponownie później."
 
+# Backward-compatible module singleton used by tests and legacy imports.
+chatbot_instance = Chatbot()
+
