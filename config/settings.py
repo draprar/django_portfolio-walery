@@ -283,6 +283,21 @@ STORAGES = {
     },
 }
 
+# In tests/CI use local storage and non-manifest static files.
+# This avoids remote S3 calls and missing manifest errors in template rendering.
+if _testing:
+    MEDIA_ROOT = BASE_DIR / "test_media"
+    MEDIA_URL = "/media/"
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
