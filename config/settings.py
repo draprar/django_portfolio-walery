@@ -51,7 +51,9 @@ if not DEBUG:
 
     # Secure Cookies
     SESSION_COOKIE_SECURE = True  # Ensures cookies are only sent over HTTPS
+    SESSION_COOKIE_HTTPONLY = True  # Prevent JS access to session cookie
     CSRF_COOKIE_SECURE = True  # Ensures CSRF cookie is only sent over HTTPS
+    CSRF_COOKIE_HTTPONLY = True  # Prevent JS access to CSRF cookie
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
     SESSION_COOKIE_AGE = 60 * 60 * 2  # 2h max session lifetime
 
@@ -139,16 +141,7 @@ else:
     DATABASES = {
         "default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}
     }
-# --- Force SQLite for pytest or Django test runner ---
-if any(arg in sys.argv for arg in ["test", "pytest"]):
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "test_db.sqlite3",
-        }
-    }
 
-# REST API configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -202,8 +195,11 @@ else:
         }
     }
 
-# --- Force SQLite + LocMemCache for pytest or Django test runner ---
-if any(arg in sys.argv for arg in ["test", "pytest"]) and not os.environ.get("CI"):
+# --- Force SQLite + LocMemCache for pytest, Django test runner, or CI ---
+# Must be placed AFTER the REDIS_URL block so it always wins.
+# Also disables django-ratelimit (LocMemCache is not shared; triggers E003 in system check).
+_testing = any(arg in sys.argv for arg in ["test", "pytest"]) or bool(os.environ.get("CI"))
+if _testing:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -215,6 +211,10 @@ if any(arg in sys.argv for arg in ["test", "pytest"]) and not os.environ.get("CI
             "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         }
     }
+    RATELIMIT_ENABLE = False  # LocMemCache is not a shared cache; disable for tests/CI
+    # django_ratelimit.checks.check_caches ignores RATELIMIT_ENABLE and
+    # unconditionally raises E003 for LocMemCache. Silence it explicitly.
+    SILENCED_SYSTEM_CHECKS = ["django_ratelimit.E003", "django_ratelimit.W001"]
 
 # JWT configuration
 SIMPLE_JWT = {
@@ -363,8 +363,9 @@ except ValueError:
 # Proxy / SSL helper and admin redirect exemptions
 # Useful when running behind Render / other proxies and to avoid redirect loops.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-# Avoid redirect loop for admin login if you handle it differently at proxy level
-SECURE_REDIRECT_EXEMPT = [r"^admin69/login/$"]
+# Avoid redirect loop for admin login if you handle it differently at proxy level.
+_admin_path = env("DJANGO_ADMIN_URL", default="admin").strip("/")
+SECURE_REDIRECT_EXEMPT = [rf"^{_admin_path}/login/$"]
 
 LOGGING = {
     "version": 1,
