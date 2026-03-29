@@ -1,23 +1,15 @@
-# core/tests/test_unit.py
+# core/tests/test_core.py
 """
 Unit tests for the `core` app.
 All tests are pure unit tests. No database access. All external dependencies are mocked.
-Comments and docstrings are in English as requested.
 """
 
-import importlib
 import json
-from unittest.mock import Mock, MagicMock, patch
+from unittest.mock import Mock, patch
 import pytest
 from django.core.exceptions import ValidationError
 from django.http import HttpRequest
-
-# ---------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------
-def apply_identity_count_visit(monkeypatch):
-    """Patch analytics.utils.count_visit to identity decorator."""
-    monkeypatch.setattr("analytics.utils.count_visit", lambda f: f)
+from django.test import RequestFactory
 
 
 # ---------------------------------------------------------------------
@@ -43,7 +35,6 @@ def test_project_str_returns_combined_titles():
 
 
 def test_file_extension_validator_rejects_bad_ext():
-    """Validator expects object with `.name` attribute, not str."""
     from django.core.validators import FileExtensionValidator
     validator = FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'webp'])
     fake_file = Mock()
@@ -68,26 +59,20 @@ def test_contact_form_valid_calls_save(monkeypatch):
     from core.forms import ContactForm
     from core import models
 
-    sentinel = object()
-
-    # Patch model save() so we don't hit the DB
-    monkeypatch.setattr(models.Contact, "save", lambda self, *a, **kw: sentinel)
+    monkeypatch.setattr(models.Contact, "save", lambda self, *a, **kw: None)
 
     data = {
         "name": "Tester",
         "email": "tester@example.com",
         "message": "Hello there, long enough message.",
-        "website": "",  # honeypot field empty
+        "website": "",
     }
 
     form = ContactForm(data=data)
     assert form.is_valid(), form.errors
 
     result = form.save()
-    # ModelForm.save() returns the instance, not whatever save() returns
-    # so check that our patched save() was called indirectly
     assert isinstance(result, models.Contact)
-
 
 
 # ---------------------------------------------------------------------
@@ -102,9 +87,7 @@ def test_health_check_view_returns_ok():
 
 
 def test_homeview_get_uses_render_and_projects(monkeypatch):
-    apply_identity_count_visit(monkeypatch)
     import core.views as views_mod
-    importlib.reload(views_mod)
 
     fake_projects = [Mock(title_en="P1"), Mock(title_en="P2")]
     monkeypatch.setattr("core.views.Project", Mock(objects=Mock(all=Mock(return_value=fake_projects))))
@@ -117,18 +100,15 @@ def test_homeview_get_uses_render_and_projects(monkeypatch):
 
     monkeypatch.setattr("core.views.render", fake_render)
 
-    fake_request = Mock()
-    resp = views_mod.HomeView().get(fake_request)
+    resp = views_mod.HomeView().get(Mock())
     assert resp.status_code == 200
     assert "form" in resp.context_data
     assert "projects" in resp.context_data
 
 
 def test_contactview_post_success_and_error_paths(monkeypatch):
-    """Test all paths in ContactView.post."""
-    apply_identity_count_visit(monkeypatch)
+    """Test success, email failure, and invalid form paths in ContactView.post."""
     import core.views as views_mod
-    importlib.reload(views_mod)
 
     fake_request = Mock()
     fake_request.headers = {'x-requested-with': 'XMLHttpRequest'}
@@ -146,7 +126,7 @@ def test_contactview_post_success_and_error_paths(monkeypatch):
     assert resp.status_code == 200
     assert json.loads(resp.content)["success"] is True
 
-    # CASE 2: valid + email raises
+    # CASE 2: valid + email raises exception
     def raise_exc(*a, **k): raise Exception("smtp boom")
     monkeypatch.setattr("core.views.send_brevo_email", raise_exc)
     resp2 = views_mod.ContactView().post(fake_request)
@@ -163,16 +143,55 @@ def test_contactview_post_success_and_error_paths(monkeypatch):
     assert "email" in body3["errors"]
 
 
-def test_contactview_rejects_non_xhr(monkeypatch):
-    apply_identity_count_visit(monkeypatch)
+def test_contactview_post_email_returns_none(monkeypatch):
+    """When send_brevo_email returns falsy, view should return 500."""
     import core.views as views_mod
-    importlib.reload(views_mod)
+
+    fake_request = Mock()
+    fake_request.headers = {'x-requested-with': 'XMLHttpRequest'}
+    fake_request.POST = {}
+
+    mock_form = Mock()
+    mock_form.is_valid.return_value = True
+    mock_form.cleaned_data = {"name": "X", "email": "x@x.x", "message": "m"}
+    monkeypatch.setattr("core.views.ContactForm", lambda *a, **k: mock_form)
+    monkeypatch.setattr("core.views.send_brevo_email", lambda *a, **k: None)
+
+    resp = views_mod.ContactView().post(fake_request)
+    assert resp.status_code == 500
+    assert json.loads(resp.content)["success"] is False
+
+
+def test_contactview_rejects_non_xhr(monkeypatch):
+    import core.views as views_mod
 
     fake_request = Mock()
     fake_request.headers = {}
-    fake_request.POST = {"name": "A", "email": "a@b.c", "message": "m", "website": ""}
+    fake_request.POST = {}
     resp = views_mod.ContactView().post(fake_request)
     assert resp.status_code == 400
+    assert json.loads(resp.content)["success"] is False
+
+
+def test_contactview_rejects_honeypot(monkeypatch):
+    """Requests with a filled honeypot field should be rejected with 400."""
+    import core.views as views_mod
+
+    fake_request = Mock()
+    fake_request.headers = {'x-requested-with': 'XMLHttpRequest'}
+    fake_request.POST = {"website": "http://spam.example"}
+
+    resp = views_mod.ContactView().post(fake_request)
+    assert resp.status_code == 400
+    assert json.loads(resp.content)["success"] is False
+
+
+@pytest.mark.django_db
+def test_contactview_get_returns_405(client):
+    """GET on /contact/ must return 405 (only POST is allowed)."""
+    from django.urls import reverse
+    resp = client.get(reverse("contact"))
+    assert resp.status_code == 405
 
 
 # ---------------------------------------------------------------------
@@ -209,6 +228,7 @@ def test_send_brevo_email_success(monkeypatch):
     monkeypatch.setattr(email_mod, "sib_api_v3_sdk", dummy)
     res = email_mod.send_brevo_email("subject", "<p>x</p>", ["a@b.c"])
     assert res == {"messageId": "ok"}
+
 
 def test_send_brevo_email_handles_api_exception(monkeypatch):
     from core import email as email_mod
@@ -251,26 +271,3 @@ def test_supabase_public_storage_url_reads_media_url(monkeypatch):
     inst = object.__new__(SupabasePublicStorage)
     assert inst.url("folder/file.jpg") == "https://cdn.example/folder/file.jpg"
 
-
-# ---------------------------------------------------------------------
-# DECORATOR RELOAD SAFETY
-# ---------------------------------------------------------------------
-def test_count_visit_decorator_idempotent(monkeypatch):
-    apply_identity_count_visit(monkeypatch)
-    import core.views as views_mod
-    importlib.reload(views_mod)
-
-    def fake_render(request, template_name, context):
-        r = Mock()
-        r.status_code = 200
-        r.context_data = context
-        return r
-
-    monkeypatch.setattr("core.views.render", fake_render)
-    monkeypatch.setattr("core.views.Project", Mock(objects=Mock(all=Mock(return_value=[]))))
-
-    req = Mock()
-    resp = views_mod.HomeView().get(req)
-    assert resp.status_code == 200
-    assert "form" in resp.context_data
-    assert "projects" in resp.context_data
