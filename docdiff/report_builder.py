@@ -553,10 +553,11 @@ def generate_html_report(block_diffs: List[Dict[str, Any]], output_path: str = "
         f.write("</div></div>")  # header end
 
         # AI summary card
+        safe_summary = html.escape(summary_html)
         f.write(f"""
         <div class='card'>
           <b data-i18n="ai_summary">AI Summary</b>:
-          <div class='small'>{summary_html}</div>
+          <div class='small'>{safe_summary}</div>
         </div>
         """)
 

@@ -164,6 +164,21 @@ def test_generate_html_report_with_ai_exception(mock_summary, mock_analyze, tmp_
     assert "_ai_labels" in blocks[0]
 
 
+@patch("docdiff.report_builder.analyze_change")
+@patch("docdiff.report_builder.generate_ai_summary", return_value="<script>alert('x')</script>")
+def test_generate_html_report_escapes_ai_summary(mock_summary, mock_analyze, tmp_path):
+    mock_analyze.return_value = {
+        "labels": ["person"], "semantic_score": 8.1,
+        "change_type": "substantive", "confidence": 0.8
+    }
+    blocks = [{"change": "changed", "type": "paragraph", "old": {"text": "a"}, "new": {"text": "b"}}]
+    out = tmp_path / "report.html"
+    rb.generate_html_report(blocks, output_path=str(out))
+    html = out.read_text(encoding="utf-8")
+    assert "<script>alert('x')</script>" not in html
+    assert "&lt;script&gt;" in html
+
+
 # --- JSON EXPORT ---
 
 def test_generate_json_report_success(tmp_path):

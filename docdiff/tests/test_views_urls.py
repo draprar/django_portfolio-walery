@@ -1,6 +1,7 @@
 import pytest
 from django.urls import reverse, resolve
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.cache import cache
 from docdiff.views import docdiff_view
 
 
@@ -55,6 +56,50 @@ class TestDocDiffView:
         assert response.status_code == 200
         html = response.content.decode().lower()
         assert "unsupported_type" in html
+
+    def test_spoofed_docx_signature_rejected(self, client):
+        url = reverse("docdiff:compare")
+        fake_docx_1 = SimpleUploadedFile(
+            "old.docx", b"not-a-zip", content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )
+        fake_docx_2 = SimpleUploadedFile(
+            "new.docx", b"still-not-a-zip", content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )
+
+        response = client.post(url, {"file_old": fake_docx_1, "file_new": fake_docx_2})
+        assert response.status_code == 200
+        html = response.content.decode().lower()
+        assert "signature_invalid" in html
+
+    def test_post_rate_limited_after_ten_requests(self, client):
+        url = reverse("docdiff:compare")
+        cache.clear()
+        post_kwargs = {"REMOTE_ADDR": "203.0.113.10"}
+
+        for _ in range(10):
+            old_file = SimpleUploadedFile("old.txt", b"a")
+            new_file = SimpleUploadedFile("new.txt", b"b")
+            response = client.post(url, {"file_old": old_file, "file_new": new_file}, **post_kwargs)
+            assert response.status_code == 200
+
+        old_file = SimpleUploadedFile("old.txt", b"a")
+        new_file = SimpleUploadedFile("new.txt", b"b")
+        response = client.post(url, {"file_old": old_file, "file_new": new_file}, **post_kwargs)
+        assert response.status_code == 403
+
+    def test_filename_path_traversal_does_not_create_outside_file(self, client, monkeypatch, tmp_path):
+        url = reverse("docdiff:compare")
+        monkeypatch.setattr("docdiff.views.tempfile.mkdtemp", lambda: str(tmp_path))
+
+        traversal_name = "../../outside.txt"
+        old_file = SimpleUploadedFile(traversal_name, b"old")
+        new_file = SimpleUploadedFile("new.txt", b"new")
+
+        response = client.post(url, {"file_old": old_file, "file_new": new_file}, REMOTE_ADDR="203.0.113.11")
+        assert response.status_code == 200
+
+        outside_candidate = (tmp_path / ".." / ".." / "outside.txt").resolve()
+        assert not outside_candidate.exists()
 
 
 class TestDocDiffUrls:
