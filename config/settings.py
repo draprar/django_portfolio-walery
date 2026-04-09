@@ -23,6 +23,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # --- django-environ init ---
 env = environ.Env(
     DJANGO_DEBUG=(bool, True),  # default: True
+    FEATURE_CHATBOT_ENABLED=(bool, False),
+    CHATBOT_MAX_INPUT_LENGTH=(int, 500),
+    CHATBOT_RESPONSE_TIMEOUT_SECONDS=(float, 5.0),
+    CHATBOT_UNANSWERED_MAX_ITEMS=(int, 10000),
+    CHATBOT_UNANSWERED_CACHE_TTL_SECONDS=(int, 7 * 24 * 3600),
 )
 environ.Env.read_env(BASE_DIR / ".env")
 
@@ -40,6 +45,13 @@ if SENTRY_DSN:
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["127.0.0.1", "localhost"])
 CSRF_TRUSTED_ORIGINS = env.list("DJANGO_CSRF_TRUSTED_ORIGINS", default=["http://localhost", "http://127.0.0.1"])
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["http://localhost", "http://127.0.0.1"])
+
+# Chatbot is intentionally disabled by default because it is not part of active UX.
+FEATURE_CHATBOT_ENABLED = env.bool("FEATURE_CHATBOT_ENABLED", default=False)
+CHATBOT_MAX_INPUT_LENGTH = env.int("CHATBOT_MAX_INPUT_LENGTH", default=500)
+CHATBOT_RESPONSE_TIMEOUT_SECONDS = env.float("CHATBOT_RESPONSE_TIMEOUT_SECONDS", default=5.0)
+CHATBOT_UNANSWERED_MAX_ITEMS = env.int("CHATBOT_UNANSWERED_MAX_ITEMS", default=10000)
+CHATBOT_UNANSWERED_CACHE_TTL_SECONDS = env.int("CHATBOT_UNANSWERED_CACHE_TTL_SECONDS", default=7 * 24 * 3600)
 
 # Security & Session settings
 if not DEBUG:

@@ -6,6 +6,7 @@ import sentry_sdk
 import requests
 import wikipedia
 from django.core.cache import cache
+from django.conf import settings
 
 
 class Chatbot:
@@ -43,8 +44,15 @@ class Chatbot:
             return {} if 'keywords' in filepath else set()
 
     def save_unanswered_questions(self, redis_key="chatbot:unanswered_questions", flush_threshold=5):
-        if len(self.unanswered_questions) % flush_threshold == 0:
-            cache.set(redis_key, pickle.dumps(self.unanswered_questions), timeout=None)
+        max_items = getattr(settings, "CHATBOT_UNANSWERED_MAX_ITEMS", 10000)
+        cache_ttl = getattr(settings, "CHATBOT_UNANSWERED_CACHE_TTL_SECONDS", 7 * 24 * 3600)
+
+        # Keep memory bounded even when chatbot is accidentally left enabled.
+        while len(self.unanswered_questions) > max_items:
+            self.unanswered_questions.pop()
+
+        if len(self.unanswered_questions) >= flush_threshold:
+            cache.set(redis_key, pickle.dumps(self.unanswered_questions), timeout=cache_ttl)
 
     def lemmatize_input(self, text):
         doc = self.nlp(text.lower())  # spaCy

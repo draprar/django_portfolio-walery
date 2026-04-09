@@ -1,11 +1,13 @@
 import pytest
 from unittest.mock import patch
 from django.urls import reverse
+from django.test import override_settings
 import wikipedia
 from tonguetwister.chatbot import chatbot_instance, Chatbot
 
 @pytest.mark.django_db
 @pytest.mark.asyncio
+@override_settings(FEATURE_CHATBOT_ENABLED=True)
 async def test_chatbot_view_with_keyword(async_client):
     response = await async_client.get(reverse("chatbot"), {"message": "rejestracja"})
     expected_variants = [
@@ -19,6 +21,7 @@ async def test_chatbot_view_with_keyword(async_client):
 
 @pytest.mark.django_db
 @pytest.mark.asyncio
+@override_settings(FEATURE_CHATBOT_ENABLED=True)
 async def test_chatbot_view_empty(async_client):
     response = await async_client.get(reverse("chatbot"))
     assert response.status_code == 200
@@ -79,3 +82,31 @@ def test_general_exception(mock_sentry):
         response = chatbot_instance.get_response("coś powoduje wyjątek")
         mock_sentry.assert_called_once()
         assert "wystąpił błąd" in response.lower()
+
+
+@pytest.mark.django_db
+@pytest.mark.asyncio
+async def test_chatbot_view_disabled_by_default(async_client):
+    response = await async_client.get(reverse("chatbot"), {"message": "hej"})
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+@pytest.mark.asyncio
+@override_settings(FEATURE_CHATBOT_ENABLED=True, CHATBOT_MAX_INPUT_LENGTH=5)
+async def test_chatbot_view_rejects_too_long_input(async_client):
+    response = await async_client.get(reverse("chatbot"), {"message": "123456"})
+    assert response.status_code == 400
+
+
+@pytest.mark.django_db
+@pytest.mark.asyncio
+@override_settings(FEATURE_CHATBOT_ENABLED=True, CHATBOT_RESPONSE_TIMEOUT_SECONDS=0.01)
+@patch("tonguetwister.views.get_chatbot")
+async def test_chatbot_view_timeout(async_get_chatbot, async_client):
+    import time
+
+    async_get_chatbot.return_value.get_response.side_effect = lambda _msg: time.sleep(0.1)
+    response = await async_client.get(reverse("chatbot"), {"message": "hej"})
+    assert response.status_code == 503
+
