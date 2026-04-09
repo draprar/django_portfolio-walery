@@ -178,7 +178,7 @@ def test_generate_ai_summary_with_changes():
     ]
     result = ai.generate_ai_summary(blocks)
     assert "The document contains" in result
-    assert "<b>technical</b>" in result
+    assert "type technical" in result
     assert "date" in result or "number" in result
 
 def nlp(text: str):

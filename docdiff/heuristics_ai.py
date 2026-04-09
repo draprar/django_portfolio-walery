@@ -263,7 +263,7 @@ def generate_ai_summary(blocks: List[Dict[str, Any]]) -> str:
 
     return (
         f"The document contains {len(changed)} changes (out of {total} blocks), "
-        f"of which {percent_major}% are of type <b>{top_type}</b>. "
+        f"of which {percent_major}% are of type {top_type}. "
         f"Dominant AI labels: "
         f"{', '.join(sorted({l for b in changed for l in (b.get('labels') or [])})) or 'none'}."
     )

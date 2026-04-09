@@ -72,12 +72,13 @@ def extract_docx_blocks(path: Path) -> List[Dict[str, Any]]:
                         if embed and embed in related:
                             part = related[embed]
                             data = part.blob if hasattr(part, "blob") else part._blob
-                            h = hashlib.sha1(data).hexdigest()
+                            h = hashlib.sha256(data).hexdigest()
                             blocks.append(
                                 {
                                     "type": "image",
                                     "text": "[IMAGE]",
                                     "sha1": h,
+                                    "sha256": h,
                                     "size": len(data),
                                     "filename": str(getattr(part, "partname", embed)),
                                 }
