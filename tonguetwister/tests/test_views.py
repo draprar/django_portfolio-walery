@@ -480,13 +480,18 @@ class TestAuthViews:
 
         assert response.status_code == 200
 
+    def test_password_reset_existing_email_redirects_to_done(self, client, regular_user):
+        response = client.post(reverse('password_reset'), data={'email': regular_user.email})
+
+        assert response.status_code == 302
+        assert response.url == reverse('password_reset_done')
+
     def test_password_reset_invalid_email(self, client, regular_user):
-        # Test password reset with invalid email shows correct response
-        user = regular_user
+        # Nie ujawniamy, czy email istnieje: zawsze redirect do strony "done"
         response = client.post(reverse('password_reset'), data={'email': 'wrongemail@example.com'})
 
-        assert response.status_code == 200
-        assert 'Nie znaleziono użytkownika z tym adresem email.' in [m.message for m in get_messages(response.wsgi_request)]
+        assert response.status_code == 302
+        assert response.url == reverse('password_reset_done')
 
     def test_password_reset_confirm_success(self, client, regular_user):
         # Test password reset confirmation with matching passwords updates password

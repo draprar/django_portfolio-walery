@@ -1,4 +1,5 @@
 import sentry_sdk
+import asyncio
 from core.email import send_brevo_email
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
@@ -86,16 +87,31 @@ def get_chatbot():
 
 async def chatbot(request):
     try:
-        user_input = request.GET.get('message', '')
+        if not settings.FEATURE_CHATBOT_ENABLED:
+            # Keep route as holder, but disable runtime access by default.
+            return JsonResponse({'detail': 'Not found.'}, status=404)
+
+        user_input = request.GET.get('message', '').strip()
         if not user_input:
             return JsonResponse({'response': 'Nie rozumiem.'})
 
-        cached_response = cache.get(user_input)
+        if len(user_input) > settings.CHATBOT_MAX_INPUT_LENGTH:
+            return JsonResponse({'response': 'Wiadomość jest za długa.'}, status=400)
+
+        cache_key = f"chatbot:view:response:{user_input}"
+        cached_response = cache.get(cache_key)
         if cached_response:
             return JsonResponse({'response': cached_response})
 
-        response = await sync_to_async(get_chatbot().get_response)(user_input)
-        cache.set(user_input, response, timeout=3600)
+        try:
+            response = await asyncio.wait_for(
+                sync_to_async(get_chatbot().get_response)(user_input),
+                timeout=settings.CHATBOT_RESPONSE_TIMEOUT_SECONDS,
+            )
+        except asyncio.TimeoutError:
+            return JsonResponse({'response': 'Przekroczono czas przetwarzania.'}, status=503)
+
+        cache.set(cache_key, response, timeout=3600)
         return JsonResponse({'response': response})
     except Exception as e:
         sentry_sdk.capture_exception(e)
@@ -790,17 +806,16 @@ def password_reset_view(request):
 
             send_brevo_email(subject, html_message, recipient_list)
 
-            return redirect('password_reset_done')
-
         except User.DoesNotExist:
+            # SECURITY: Do not reveal whether an account exists for this email.
+            # Log silently for monitoring, but always show the same response.
             sentry_sdk.capture_message(
                 f'Nieudana próba resetowania hasła dla: {email}',
                 level='warning'
             )
-            messages.error(
-                request,
-                'Nie znaleziono użytkownika z tym adresem email.'
-            )
+
+        # Always redirect regardless of User existence (prevents user enumeration)
+        return redirect('password_reset_done')
 
     return render(
         request,
