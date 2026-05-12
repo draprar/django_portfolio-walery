@@ -1,6 +1,8 @@
 from django.urls import path
-from .views import Home, UploadImage, DeleteImage, CreateCategory, ContactView, CategoryListView, GalleryListView
+
 from analytics.utils import count_visit
+
+from .views import CategoryListView, CreateCategory, DeleteImage, GalleryListView, Home, UploadImage
 
 app_name = 'gallery'
 

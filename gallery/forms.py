@@ -1,5 +1,6 @@
 from django import forms
-from .models import Category, Gallery, Contact
+
+from .models import Category, Contact, Gallery
 
 
 class GalleryForm(forms.ModelForm):

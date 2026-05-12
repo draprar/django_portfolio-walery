@@ -4,7 +4,6 @@ from django.db import DatabaseError
 
 from .models import Category
 
-
 logger = logging.getLogger(__name__)
 
 

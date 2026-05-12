@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Gallery, Category
+
+from .models import Category, Gallery
 
 
 class CategorySerializer(serializers.ModelSerializer):
