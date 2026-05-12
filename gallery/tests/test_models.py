@@ -1,8 +1,10 @@
-import pytest
-from gallery.models import Category, Gallery, Contact, InstagramPost
 from datetime import datetime
-from django.utils.timezone import now
+
+import pytest
 from django.core.exceptions import ValidationError
+from django.utils.timezone import now
+
+from gallery.models import Category, Contact, Gallery, InstagramPost
 
 
 @pytest.mark.django_db
@@ -35,7 +37,7 @@ def test_gallery_creation():
     gallery = Gallery.objects.create(
         category=category,
         image="test_image.jpg",
-        description="A beautiful drawing."
+        description="A beautiful drawing.",
     )
 
     # Assert gallery fields
@@ -66,10 +68,10 @@ def test_gallery_deletion_with_category():
     category = Category.objects.create(title="Drawings")
 
     # Create a gallery item linked to the category
-    gallery = Gallery.objects.create(
+    Gallery.objects.create(
         category=category,
         image="test_image.jpg",
-        description="A beautiful drawing."
+        description="A beautiful drawing.",
     )
 
     # Delete the category
@@ -85,7 +87,7 @@ def test_contact_creation():
     contact = Contact.objects.create(
         name="John Doe",
         email="johndoe@example.com",
-        message="Hello, I am interested in your gallery."
+        message="Hello, I am interested in your gallery.",
     )
 
     # Assert contact fields
@@ -102,7 +104,7 @@ def test_contact_str_representation():
     contact = Contact.objects.create(
         name="Jane Doe",
         email="janedoe@example.com",
-        message="I'd like to collaborate."
+        message="I'd like to collaborate.",
     )
 
     # Assert string representation
@@ -115,6 +117,7 @@ def test_contact_required_fields():
     contact = Contact(name="", email="", message="")
     with pytest.raises(ValidationError):
         contact.full_clean()  # Explicitly validate the model instance
+
 
 @pytest.mark.django_db
 def test_instagram_post_creation():

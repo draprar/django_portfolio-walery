@@ -1,8 +1,10 @@
 from io import BytesIO
-from PIL import Image
-from django.core.files.uploadedfile import SimpleUploadedFile
+
 import pytest
-from gallery.forms import GalleryForm, ContactForm, CategoryForm
+from django.core.files.uploadedfile import SimpleUploadedFile
+from PIL import Image
+
+from gallery.forms import CategoryForm, ContactForm, GalleryForm
 from gallery.models import Category
 
 
