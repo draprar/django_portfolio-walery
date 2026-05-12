@@ -1,15 +1,14 @@
 {% extends 'gallery/core.html' %}
 {% load static %}
 
-{% block title %}Walery's gallery{% endblock %}
+{% block title %}BAZGROLLIN'{% endblock %}
 
 {% block content %}
 
 <!-- About Me Section -->
 <section class="about-me fade-in">
     <div class="about-content">
-        <h1>Walery's gallery</h1>
-        <p>Have fun exploring.</p>
+        <h1>se bazgrollin'</h1>
     </div>
 </section>
 
@@ -39,17 +38,17 @@
             {% if selected_category and selected_category != 'All' %}
                 {{ selected_category }}
             {% else %}
-                GenAI
+                Artwork Collection
             {% endif %}
         </h2>
 
         <div class="gallery-grid">
             {% for object in object_list %}
                 <div class="gallery-item">
-                    <a href="{{ object.image.url }}" data-fancybox="gallery" data-caption="{{ object.description|default:'Untitled' }}">
-                        <img src="{{ object.image.url }}" alt="{{ object.description|default:'Artwork' }}" loading="lazy">
+                    <a href="{{ object.image.url }}" data-fancybox="gallery" data-caption="{{ object.title|default:object.description|default:'Artwork' }}">
+                        <img src="{{ object.image.url }}" alt="{{ object.title|default:object.description|default:'Artwork' }}" loading="lazy">
                         <div class="overlay">
-                            <p>{{ object.description|default:"Untitled" }}</p>
+                            <p>{{ object.title|default:object.description|default:"Untitled" }}</p>
                         </div>
                     </a>
                 </div>
