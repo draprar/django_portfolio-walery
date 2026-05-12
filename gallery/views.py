@@ -1,16 +1,19 @@
+import logging
+
 from django.conf import settings
 from django.contrib import messages
-from django.core.mail import send_mail, BadHeaderError
-from django.views import generic, View
-from django.urls import reverse_lazy
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseServerError, HttpResponseNotFound
-from .models import Category, Gallery, InstagramPost
-from .forms import GalleryForm, CategoryForm, ContactForm
-from .serializers import GallerySerializer, CategorySerializer
-from rest_framework import generics, filters
 from django.contrib.auth.mixins import UserPassesTestMixin
-import logging
+from django.core.mail import BadHeaderError, send_mail
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views import View, generic
+from django_ratelimit.decorators import ratelimit
+from rest_framework import filters, generics
+
+from .forms import CategoryForm, ContactForm, GalleryForm
+from .models import Category, Gallery, InstagramPost
+from .serializers import CategorySerializer, GallerySerializer
 
 # Setup logging for better debugging and monitoring
 logger = logging.getLogger(__name__)
@@ -123,6 +126,10 @@ class ContactView(View):
     Handles displaying and processing of the contact form.
     """
     template_name = 'gallery/contact.html'
+
+    @method_decorator(ratelimit(key="ip", rate="5/m", method="POST", block=True))
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
 
     def get(self, request):
         """
