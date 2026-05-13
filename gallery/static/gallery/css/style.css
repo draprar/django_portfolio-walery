@@ -127,7 +127,7 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 60px 40px 50px;
+    padding: 20px 40px 0px;
 }
 
 /* Remove the gradient overlay pseudo-element */
@@ -402,7 +402,7 @@ body {
         font-size: 1.2rem;
     }
     .about-content {
-        padding: 20px 20px;
+        padding: 1px 20px;
     }
     .gallery-grid {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
