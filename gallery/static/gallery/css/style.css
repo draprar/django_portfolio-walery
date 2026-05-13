@@ -7,7 +7,6 @@ body {
     min-height: 100vh;
 }
 
-/* Navbar with Glassmorphism */
 .navbar {
     background: rgba(10, 10, 10, 0.95);
     backdrop-filter: blur(10px);
@@ -16,35 +15,74 @@ body {
     margin-bottom: 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    font-size: 1.4rem;
+    font-weight: 200;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: #c4922a !important;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand img {
+    margin-right: 20px;
+    width: 38px;
+    height: auto;
+    filter: grayscale(1) brightness(0.6) opacity(0.8);
+    transition: all 0.4s ease;
+}
+
+/* Interaction on hover */
+.navbar-brand:hover {
+    letter-spacing: 6px;
+}
+
+.navbar-brand:hover img {
+    filter: grayscale(0) brightness(1) opacity(1);
+    transform: scale(1.1) rotate(-5deg);
+}
+
+
 .navbar a {
     color: #e0e0e0;
+    font-weight: 300;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
     transition: color 0.3s ease;
 }
+
 .navbar a:hover {
-    color: #daa520;
+    color: #c4922a;
 }
 
 .navbar .nav-link.active {
-    color: #daa520 !important;
+    color: #c4922a !important;
     font-weight: bold;
-    text-shadow: 0 0 10px rgba(218, 165, 32, 0.5);
+    text-shadow: 0 0 10px rgba(196, 146, 42, 0.5);
 }
 
+/* Przycisk Contact */
 .navbar .nav-link.contact-link {
     margin-left: 15px;
-    background: linear-gradient(45deg, #daa520, #a0522d);
+    background: linear-gradient(45deg, #c4922a, #a0522d);
     color: #fff !important;
     padding: 8px 16px;
     border-radius: 25px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(218, 165, 32, 0.3);
-}
-.navbar .nav-link.contact-link:hover {
-    background: linear-gradient(45deg, #ffd700, #8b4513);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(218, 165, 32, 0.5);
+    box-shadow: 0 4px 15px rgba(196, 146, 42, 0.3);
 }
 
+.navbar .nav-link.contact-link:hover {
+    background: linear-gradient(45deg, #d4a535, #8b4513);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(196, 146, 42, 0.5);
+}
+
+/* Toggler mobilny */
 .navbar-toggler {
     border: none !important;
     outline: none !important;
@@ -78,67 +116,97 @@ body {
     display: block;
     width: 60px;
     height: 4px;
-    background: linear-gradient(45deg, #daa520, #a0522d);
+    background: linear-gradient(45deg, #c4922a, #a0522d);
     margin: 10px auto;
     border-radius: 2px;
 }
 
-/* Hero Section (Refined About Me) */
+/* No background image, no overlay — clean typographic hero */
 .about-me {
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    height: 20vh;
-    background: url("../img/bg.jpg") no-repeat center center/cover;
-    background-size: cover;
-    color: #fff;
-    position: relative;
-    padding: 40px;
-    border-radius: 0 0 50px 50px;
-    overflow: hidden;
-    box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.5);
+    padding: 60px 40px 50px;
 }
 
-/* Overlay Effect */
+/* Remove the gradient overlay pseudo-element */
 .about-me::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(218, 165, 32, 0.1));
-    backdrop-filter: blur(2px);
+    display: none;
 }
 
-/* Frosted Glass Text Box */
 .about-content {
     position: relative;
     z-index: 2;
-    padding: 30px 50px;
+    padding: 10px 50px;
 }
 
-/* Stylish Text */
+/* Thin, solid-gold title */
 .about-me h1 {
     font-size: 3.5rem;
-    font-weight: bold;
+    font-weight: 200;
     text-transform: uppercase;
-    letter-spacing: 3px;
-    background: linear-gradient(45deg, #daa520, #a0522d, #ffd700);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    letter-spacing: 8px;
+    color: #c4922a;
     margin-bottom: 10px;
 }
 
 .about-me p {
-    font-size: 1.6rem;
-    opacity: 0.9;
+    font-size: 1.4rem;
+    opacity: 0.7;
     font-weight: 300;
+    color: #c4c4c4;
 }
 
-/* Instagram Section */
+/* Instagram hero link */
+.hero-link {
+    color: inherit;
+    text-decoration: none;
+    display: inline-block;
+    position: relative;
+    transition: color 0.35s ease, letter-spacing 0.35s ease;
+}
+
+/* Animated underline on hover */
+.hero-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #c4922a;
+    transition: width 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.hero-link:hover {
+    color: #d9ad55;
+    letter-spacing: 10px;
+}
+
+.hero-link:hover::after {
+    width: 100%;
+}
+
+/* Small Instagram icon next to the link */
+.hero-link .ig-icon {
+    display: inline-block;
+    vertical-align: middle;
+    width: 0.65em;
+    height: 0.65em;
+    margin-left: 0.4em;
+    margin-bottom: 0.1em;
+    opacity: 0;
+    transform: translateY(-3px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.hero-link:hover .ig-icon {
+    opacity: 0.8;
+    transform: translateY(0);
+}
+
+/* ── Instagram Section ──────────────────────────────────────────────────── */
 .instagram-section {
     text-align: center;
     margin-top: 0px;
@@ -148,21 +216,58 @@ body {
 
 .instagram-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    overflow: hidden;
+}
+
+
+.instagram-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    align-items: start;
 }
 
 .instagram-item {
+    background: rgba(15, 15, 15, 0.6);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+}
+
+.instagram-item iframe {
+    border: none !important;
+    box-shadow: none !important;
+    display: block !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    margin: 0 !important;
+}
+
+.instagram-media {
+    min-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+.ig-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    text-align: center;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 15px;
-    padding: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    z-index: 1;
+    background: #111;
 }
 .instagram-item:hover {
     transform: translateY(-5px);
@@ -174,19 +279,48 @@ body {
     margin: 0 auto !important;
 }
 
+.instagram-media {
+    margin: 0 auto !important;
+    min-width: unset !important;
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
 .instagram-item iframe {
     width: 100% !important;
     max-width: 100% !important;
-    height: auto !important;
-    min-height: 500px !important;
+    min-width: unset !important;
+    height: auto !important;   /* let Instagram control height; no min-height clipping */
     display: block;
     margin: 0 auto;
 }
 
-/* Instagram - fix centering mobile */
-.instagram-media {
-    margin: 0 auto !important;
-    min-width: unset !important;
+/* Skeleton placeholder while embeds load lazily */
+.ig-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    min-height: 380px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(30, 25, 15, 0.9), rgba(20, 18, 10, 0.95));
+    color: #6b5c3a;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    animation: igPulse 2s ease-in-out infinite;
+}
+
+.ig-placeholder svg {
+    width: 36px;
+    height: 36px;
+    color: #c4922a;
+    opacity: 0.45;
+}
+
+@keyframes igPulse {
+    0%, 100% { opacity: 0.6; }
+    50%       { opacity: 1;   }
 }
 
 @media (max-width: 768px) {
@@ -196,7 +330,6 @@ body {
     }
 }
 
-/* Responsive Gallery Grid with Masonry-like Effect */
 .gallery-container {
     max-width: 95%;
     margin: auto;
@@ -268,7 +401,7 @@ body {
         font-size: 1.2rem;
     }
     .about-content {
-        padding: 20px 30px;
+        padding: 20px 20px;
     }
     .gallery-grid {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -303,7 +436,7 @@ body {
         padding: 10px 15px;
     }
     .navbar-nav .nav-link:hover {
-        color: #daa520 !important;
+        color: #c4922a !important;
     }
 }
 

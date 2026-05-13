@@ -8,7 +8,8 @@
 <!-- About Me Section -->
 <section class="about-me fade-in">
     <div class="about-content">
-        <h1>bazgrollin'</h1>
+        <h1><a href="https://www.instagram.com/bazgrollin/" target="_blank" rel="noopener noreferrer" class="hero-link">bazgrollin'</a></h1>
+        <p>Se bazgrolę, enjoy.</p>
     </div>
 </section>
 
@@ -34,28 +35,32 @@
 <!-- Gallery Section (Show Only If "All" or a Gallery Category is Selected) -->
 {% if not selected_category or selected_category == 'All' or selected_category != 'Instagram' %}
     <section class="gallery-container fade-in">
-        <h2 class="section-title">
-            {% if selected_category and selected_category != 'All' %}
-                {{ selected_category }}
-            {% else %}
-                Artwork Collection
-            {% endif %}
-        </h2>
+        {% for category in categories %}
+            {% if category.title != 'Instagram' %}
 
-        <div class="gallery-grid">
-            {% for object in object_list %}
-                <div class="gallery-item">
-                    <a href="{{ object.image.url }}" data-fancybox="gallery" data-caption="{% if object.title and object.description %}<div class='fb-title'>{{ object.title }}</div><div class='fb-description'>{{ object.description }}</div>{% elif object.title %}<div class='fb-title'>{{ object.title }}</div>{% elif object.description %}<div class='fb-description'>{{ object.description }}</div>{% else %}Artwork{% endif %}">
-                        <img src="{{ object.image.url }}" alt="{{ object.title|default:object.description|default:'Artwork' }}" loading="lazy">
-                        <div class="overlay">
-                            <p>{{ object.title|default:object.description|default:"Untitled" }}</p>
+                {% if not selected_category or selected_category == 'All' or selected_category == category.title %}
+                    <div class="category-block mb-5">
+                        <h2 class="section-title">{{ category.title }}</h2>
+
+                        <div class="gallery-grid">
+                            {% for art in category.images.all %}
+                                <div class="gallery-item">
+                                    <a href="{{ art.image.url }}" data-fancybox="gallery-{{ category.id }}" data-caption="{{ art.title|default:art.description|default:category.title }}">
+                                        <img src="{{ art.image.url }}" alt="{{ art.title|default:category.title }}" loading="lazy">
+                                        <div class="overlay">
+                                            <p>{{ art.title|default:"Untitled" }}</p>
+                                        </div>
+                                    </a>
+                                </div>
+                            {% empty %}
+                                <p class="no-images">Brak zdjęć w tej kategorii.</p>
+                            {% endfor %}
                         </div>
-                    </a>
-                </div>
-            {% empty %}
-                <p class="no-images">No images found in this category.</p>
-            {% endfor %}
-        </div>
+                    </div>
+                {% endif %}
+
+            {% endif %}
+        {% endfor %}
     </section>
 {% endif %}
 
