@@ -21,7 +21,10 @@
             <div class="instagram-grid">
                 {% for post in instagram_posts %}
                     <div class="instagram-item">
-                        <blockquote class="instagram-media" data-instgrm-permalink="{{ post.image_url }}" data-instgrm-version="13">
+                        <blockquote class="instagram-media"
+                                    data-instgrm-permalink="{{ post.image_url }}{% if not post.image_url|slice:'-1:' == '/' %}/{% endif %}"
+                                    data-instgrm-version="13"
+                                    style="width: 100%; margin: 0;">
                             <a href="{{ post.image_url }}" target="_blank">View on Instagram</a>
                         </blockquote>
                     </div>

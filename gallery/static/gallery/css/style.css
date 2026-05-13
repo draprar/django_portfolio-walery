@@ -238,14 +238,15 @@ body {
 .instagram-item {
     background: rgba(15, 15, 15, 0.6);
     border-radius: 12px;
-    overflow: hidden;
+    overflow: visible; /* Zmień z hidden na visible, żeby skrypt mógł rozciągnąć ramkę */
     position: relative;
-    min-height: 500px;
+    /* Usuń min-height: 500px; */
     display: flex;
     flex-direction: column;
 }
 
 .instagram-item iframe {
+    min-height: 450px;
     border: none !important;
     box-shadow: none !important;
     display: block !important;
