@@ -89,7 +89,7 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
-    height: 40vh;
+    height: 20vh;
     background: url("../img/bg.jpg") no-repeat center center/cover;
     background-size: cover;
     color: #fff;
@@ -178,6 +178,15 @@ body {
 .instagram-item blockquote {
     width: 100% !important;
     margin: 0 auto !important;
+}
+
+.instagram-item iframe {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 500px !important;
+    display: block;
+    margin: 0 auto;
 }
 
 @media (max-width: 768px) {
@@ -362,4 +371,19 @@ body {
     background: linear-gradient(45deg, #9333ea, #db2777);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5);
+}
+
+/* Fancybox Caption Styling */
+.fb-title {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.fb-description {
+    font-weight: normal;
+    font-size: 0.9em;
+    opacity: 0.9;
+    display: block;
 }

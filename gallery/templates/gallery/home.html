@@ -8,7 +8,7 @@
 <!-- About Me Section -->
 <section class="about-me fade-in">
     <div class="about-content">
-        <h1>se bazgrollin'</h1>
+        <h1>bazgrollin'</h1>
     </div>
 </section>
 
@@ -45,7 +45,7 @@
         <div class="gallery-grid">
             {% for object in object_list %}
                 <div class="gallery-item">
-                    <a href="{{ object.image.url }}" data-fancybox="gallery" data-caption="{{ object.title|default:object.description|default:'Artwork' }}">
+                    <a href="{{ object.image.url }}" data-fancybox="gallery" data-caption="{% if object.title and object.description %}<div class='fb-title'>{{ object.title }}</div><div class='fb-description'>{{ object.description }}</div>{% elif object.title %}<div class='fb-title'>{{ object.title }}</div>{% elif object.description %}<div class='fb-description'>{{ object.description }}</div>{% else %}Artwork{% endif %}">
                         <img src="{{ object.image.url }}" alt="{{ object.title|default:object.description|default:'Artwork' }}" loading="lazy">
                         <div class="overlay">
                             <p>{{ object.title|default:object.description|default:"Untitled" }}</p>

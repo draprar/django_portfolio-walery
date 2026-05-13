@@ -27,4 +27,23 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
+
+    // Force Instagram embeds to load on mobile
+    const loadInstagramEmbeds = () => {
+        if (window.instgrm && window.instgrm.Embeds) {
+            window.instgrm.Embeds.process();
+        }
+    };
+
+    // Try immediately
+    loadInstagramEmbeds();
+
+    // Retry after a short delay in case script hasn't loaded yet
+    setTimeout(loadInstagramEmbeds, 1000);
+
+    // Retry after 3 seconds
+    setTimeout(loadInstagramEmbeds, 3000);
+
+    // Retry after page load
+    window.addEventListener('load', loadInstagramEmbeds);
 });

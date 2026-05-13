@@ -1,9 +1,10 @@
-from pathlib import Path
 import sys
-import os
-import environ
-import dj_database_url
 from datetime import timedelta
+from pathlib import Path
+
+import dj_database_url
+import environ
+from django.core.exceptions import ImproperlyConfigured
 
 """
 Django settings for config project.
@@ -36,15 +37,41 @@ environ.Env.read_env(BASE_DIR / ".env")
 
 SECRET_KEY = env("DJANGO_SECRET_KEY", default="dev-insecure-change-me")
 DEBUG = env("DJANGO_DEBUG")
+if not DEBUG and SECRET_KEY == "dev-insecure-change-me":
+    raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set in production")
+
 SENTRY_DSN = env("SENTRY_DSN", default=None)
 if SENTRY_DSN:
     import sentry_sdk
     from sentry_sdk.integrations.redis import RedisIntegration
-    sentry_sdk.init(dsn=SENTRY_DSN, integrations=[RedisIntegration()], traces_sample_rate=1.0, send_default_pii=False)
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[RedisIntegration()],
+        # 10% sampling in production to keep Sentry costs manageable.
+        # Increase to 1.0 only for short debugging sessions.
+        traces_sample_rate=0.1,
+        send_default_pii=False,
+    )
 
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["127.0.0.1", "localhost"])
 CSRF_TRUSTED_ORIGINS = env.list("DJANGO_CSRF_TRUSTED_ORIGINS", default=["http://localhost", "http://127.0.0.1"])
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["http://localhost", "http://127.0.0.1"])
+
+
+def _validate_production_env() -> None:
+    """Fail fast for obviously unsafe production-like configuration."""
+    if DEBUG:
+        return
+
+    localhost_hosts = {"127.0.0.1", "localhost"}
+    if not ALLOWED_HOSTS or set(ALLOWED_HOSTS).issubset(localhost_hosts):
+        raise ImproperlyConfigured("Set DJANGO_ALLOWED_HOSTS to real production domains when DJANGO_DEBUG=False")
+
+    if any(not origin.startswith("https://") for origin in CSRF_TRUSTED_ORIGINS):
+        raise ImproperlyConfigured("All DJANGO_CSRF_TRUSTED_ORIGINS values must use https:// in production")
+
+
+_validate_production_env()
 
 # Chatbot is intentionally disabled by default because it is not part of active UX.
 FEATURE_CHATBOT_ENABLED = env.bool("FEATURE_CHATBOT_ENABLED", default=False)
@@ -151,7 +178,7 @@ if DATABASE_URL:
 else:
     # Local/dev fallback
     DATABASES = {
-        "default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}
+        "default": {"ENGINE": "django.db.backends.sqlite3", "NAME": str(BASE_DIR / "db.sqlite3")}
     }
 
 REST_FRAMEWORK = {
@@ -215,7 +242,7 @@ if _testing:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "test_db.sqlite3",
+            "NAME": str(BASE_DIR / "test_db.sqlite3"),
         }
     }
     CACHES = {
@@ -269,35 +296,57 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 WHITENOISE_MANIFEST_STRICT = False
 
-# --- Supabase (S3-compatible) via django-storages ---
-AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
-AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")
-SUPABASE_PROJECT_REF = env("SUPABASE_PROJECT_REF")
+# --- Media storage backend ---
+# Use S3/Supabase only when explicitly enabled. Local file storage is default in dev.
+USE_S3 = env.bool("USE_S3", default=not DEBUG and not _testing)
 
-AWS_S3_ENDPOINT_URL = f"https://{SUPABASE_PROJECT_REF}.supabase.co/storage/v1/s3"
+if USE_S3:
+    AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID", default=None)
+    AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY", default=None)
+    AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME", default=None)
+    SUPABASE_PROJECT_REF = env("SUPABASE_PROJECT_REF", default=None)
 
-# Public URL for use in templates (Supabase public object URL)
-MEDIA_URL = f"https://{SUPABASE_PROJECT_REF}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}/"
+    missing = [
+        k for k, v in {
+            "AWS_ACCESS_KEY_ID": AWS_ACCESS_KEY_ID,
+            "AWS_SECRET_ACCESS_KEY": AWS_SECRET_ACCESS_KEY,
+            "AWS_STORAGE_BUCKET_NAME": AWS_STORAGE_BUCKET_NAME,
+            "SUPABASE_PROJECT_REF": SUPABASE_PROJECT_REF,
+        }.items() if not v
+    ]
+    if missing:
+        raise ImproperlyConfigured(f"Missing required S3 settings: {', '.join(missing)}")
 
-# Options
-AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME", default=None)
-AWS_QUERYSTRING_AUTH = False
-AWS_S3_SIGNATURE_VERSION = "s3v4"
-AWS_DEFAULT_ACL = None
-AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "public, max-age=86400"}
+    AWS_S3_ENDPOINT_URL = f"https://{SUPABASE_PROJECT_REF}.supabase.co/storage/v1/s3"
+    # Public URL for use in templates (Supabase public object URL)
+    MEDIA_URL = f"https://{SUPABASE_PROJECT_REF}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}/"
+    AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME", default=None)
+    AWS_QUERYSTRING_AUTH = False
+    AWS_S3_SIGNATURE_VERSION = "s3v4"
+    AWS_DEFAULT_ACL = None
+    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "public, max-age=86400"}
 
-STORAGES = {
-    "default": {
-        "BACKEND": "core.storages_backends.SupabasePublicStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
+    STORAGES = {
+        "default": {
+            "BACKEND": "core.storages_backends.SupabasePublicStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+else:
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = BASE_DIR / "media"
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
 
 # In tests/CI use local storage and non-manifest static files.
-# This avoids remote S3 calls and missing manifest errors in template rendering.
 if _testing:
     MEDIA_ROOT = BASE_DIR / "test_media"
     MEDIA_URL = "/media/"
@@ -337,8 +386,9 @@ LOGOUT_REDIRECT_URL = "main"
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
 
-# Start in report-only mode
-SECURE_CSP_REPORT_ONLY = True
+# Report-only in dev so we can test without breaking pages;
+# in production the policy is enforced (blocks violations).
+SECURE_CSP_REPORT_ONLY = DEBUG
 SECURE_CSP = {
     "default-src": "'self'",
     "script-src": (
@@ -361,7 +411,7 @@ SECURE_CSP = {
     "img-src": "'self' data: https:",
     "font-src": "'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:",
     "connect-src": "'self' https://cdn.jsdelivr.net https://unpkg.com",
-    "frame-src": "'self' https://www.youtube.com",
+    "frame-src": "'self' https://www.youtube.com https://www.instagram.com",
     "frame-ancestors": "'none'",
 }
 
@@ -391,9 +441,9 @@ except ValueError:
 # Proxy / SSL helper and admin redirect exemptions
 # Useful when running behind Render / other proxies and to avoid redirect loops.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-# Avoid redirect loop for admin login if you handle it differently at proxy level.
-_admin_path = env("DJANGO_ADMIN_URL", default="admin").strip("/")
-SECURE_REDIRECT_EXEMPT = [rf"^{_admin_path}/login/$"]
+# Optional redirect exemptions for unusual proxy setups.
+# Leave empty by default in production to keep HTTPS redirect strict.
+SECURE_REDIRECT_EXEMPT = env.list("DJANGO_SECURE_REDIRECT_EXEMPT", default=[])
 
 LOGGING = {
     "version": 1,
