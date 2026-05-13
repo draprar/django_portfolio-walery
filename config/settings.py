@@ -54,8 +54,9 @@ if SENTRY_DSN:
     )
 
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["127.0.0.1", "localhost"])
-CSRF_TRUSTED_ORIGINS = env.list("DJANGO_CSRF_TRUSTED_ORIGINS", default=["http://localhost", "http://127.0.0.1"])
-CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["http://localhost", "http://127.0.0.1"])
+# In production, require explicit CSRF_TRUSTED_ORIGINS (no default with http://)
+CSRF_TRUSTED_ORIGINS = env.list("DJANGO_CSRF_TRUSTED_ORIGINS", default=[] if not DEBUG else ["http://localhost", "http://127.0.0.1"])
+CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[] if not DEBUG else ["http://localhost", "http://127.0.0.1"])
 
 
 def _validate_production_env() -> None:
@@ -67,8 +68,12 @@ def _validate_production_env() -> None:
     if not ALLOWED_HOSTS or set(ALLOWED_HOSTS).issubset(localhost_hosts):
         raise ImproperlyConfigured("Set DJANGO_ALLOWED_HOSTS to real production domains when DJANGO_DEBUG=False")
 
-    if any(not origin.startswith("https://") for origin in CSRF_TRUSTED_ORIGINS):
-        raise ImproperlyConfigured("All DJANGO_CSRF_TRUSTED_ORIGINS values must use https:// in production")
+    if CSRF_TRUSTED_ORIGINS and any(not origin.startswith("https://") for origin in CSRF_TRUSTED_ORIGINS):
+        raise ImproperlyConfigured(
+            "All DJANGO_CSRF_TRUSTED_ORIGINS values must use https:// in production. "
+            "Set the DJANGO_CSRF_TRUSTED_ORIGINS environment variable with https:// origins, e.g.: "
+            "'https://example.com https://www.example.com'"
+        )
 
 
 _validate_production_env()
